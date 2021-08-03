@@ -1,21 +1,30 @@
 // Dependencies
 const express = require('express');
-const socket = require('socket.io');
+const http = require('http');
+const { Server } = require('socket.io');
 
 //Sets port to a value
-const PORT = process.env.PORT || 4422;
+const PORT = process.env.PORT || 4433;
 
 // Initializes the variable "app" with express()
 const app = express();
 
-//Configures express
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-
 //Sets up static folder
-app.use(express.static(path.join(__dirname, 'public'),{extensions:['html']}));
+app.use(express.static('public'));
+
+//
+const server = http.createServer(app);
+
+//
+const io = new Server(server);
 
 //Listens, reports to console that a server has successfully started on PORT
-app.listen(PORT, function(req, res){
-    console.log(`Server listening on port ${PORT}.`)
-});
+server.listen(PORT, () => {
+    console.log('Server listening on port: ' + PORT);
+  });
+
+//Socket behavior
+io.on('connection', (socket) => {
+    console.log('User connected with socketID: ' + socket.id);
+  });
+  
