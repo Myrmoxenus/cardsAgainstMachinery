@@ -4,8 +4,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 
 //Card Decks
-let whiteCardArray = require('./cards/GeneratedWhiteCardsTest.js')
-let testArray = ['fuck', 'you']
+let whiteCardArray = require('./cards/GeneratedWhiteCards.js')
 
 //Sets port to a value
 const PORT = process.env.PORT || 4433;
@@ -33,14 +32,14 @@ server.listen(PORT, () => {
   
 //Socket behavior
 io.on('connection', (socket) => {
+
   socket.on('testButton', function(data){
-    console.log(whiteCardArray[randomUpTo(whiteCardArray.length-1)])
+    let emitData = whiteCardArray[randomUpTo(whiteCardArray.length-1)];
+    io.sockets.emit('drawWhiteCard', emitData);
   });
+
     console.log('User connected with socketID: ' + socket.id);
   });
 
 
-console.log(typeof whiteCardArray)
-console.log(typeof testArray)
-console.log(whiteCardArray)
-console.log(testArray[0])
+

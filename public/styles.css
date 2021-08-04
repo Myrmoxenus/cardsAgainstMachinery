@@ -10,9 +10,11 @@ body{
     display: inline-block;
     position: relative;
     margin: 5px;
+    left: 0%;
 }
 
 .cardContent {
+    font-size: 1.2vw;
     margin: 0;
     position: absolute;
     top: 50%;

@@ -1,13 +1,15 @@
 const serverURL = 'http://localhost:4433';
 const socket = io.connect(serverURL);
 
+//import textFit from 'textfit'
+
 let playerHand = document.getElementById('playerHand');
 let testButton = document.getElementById('testButton');
 
-testButton.addEventListener('click', testButtonClick)
+testButton.addEventListener('click', testButtonClick);
 
 function testButtonClick(){
-    socket.emit('testButton', 'testDataWOO');
+    socket.emit('testButton');
 }
 
 function createCard(color, content, destination){
@@ -27,3 +29,11 @@ function createCard(color, content, destination){
     destination.appendChild(cardDiv)
 }
 
+// Listen for events
+socket.on('drawWhiteCard', function(data){
+    createCard('white', data, playerHand);
+});
+
+createCard('red', `The hilariously underappreciated dance of floating a man's head in a jugular and tasting his urine.`, playerHand)
+createCard('white', 'The hilariously underappreciated dance of floating a mans head in a jugular and tasting his urine.', playerHand)
+createCard('white', `Test.`, playerHand)
