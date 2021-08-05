@@ -10,17 +10,25 @@ body{
     display: inline-block;
     position: relative;
     margin: 5px;
-    left: 0%;
+    user-select: none; 
+  
 }
 
 .cardContent {
+    padding-left: 1vw;
+    padding-right: 1vw;
     font-size: 1.2vw;
     margin: 0;
     position: absolute;
+}
+
+
+.shortContent{
+    padding: 0 !important;
     top: 50%;
     left: 50%;
     -ms-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%); 
 }
 
 .whiteCard{
@@ -32,3 +40,19 @@ body{
     background-color: #FF4242;
     color: white;
 }
+
+#hiddenTestCard{
+    /*I'm not sure why copying this stuff helped*/
+    border-radius: 5px;
+    width: 10%;
+    padding-bottom: 10%;
+    text-align: center;
+    display: inline-block;
+    position: relative;
+    margin: 5px;
+    user-select: none; 
+    visibility: hidden;
+    z-index: -1;
+    position: absolute;
+}
+
