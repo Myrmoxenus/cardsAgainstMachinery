@@ -13,26 +13,30 @@ function createNamePlates(nameArray){
     function createNamePlate(name){
         let namePlateDiv = document.createElement('div')
         namePlateDiv.className = 'namePlate'
-        namePlateDiv.style.height = 90/nameArray.length + '%'
         let namePlateContentDiv = document.createElement('div')
         namePlateContentDiv.className = 'namePlateContent'
         let namePlateFontSize = 2
         
-        if(name.length > 63){
-            let extraTextLength = name.length - 63
-            namePlateFontSize = 2 - extraTextLength*0.0022
+        if(name.length > 40){
+            let extraTextLength = name.length - 40
+            let magicSlope = 1.62/name.length
+            namePlateFontSize = 2 - extraTextLength*magicSlope
             if (namePlateFontSize < 0.2){
                 namePlateFontSize = 0.2
             }
         }
-        if(name.length>15700){
-            namePlateDiv.style.overflowY='scroll'
+        if(name.length>400){
+            namePlateContentDiv.style.overflowY='scroll'
         }
         namePlateContentDiv.style.fontSize = namePlateFontSize + 'vw'
         namePlateContentDiv.innerHTML = name
         
+        let scoreContainerDiv = document.createElement('div')
+        scoreContainerDiv.className = 'scoreContainer'
         informationPanel.appendChild(namePlateDiv)
         namePlateDiv.appendChild(namePlateContentDiv)
+        namePlateDiv.appendChild(scoreContainerDiv)
+       
 
     }
 
@@ -51,8 +55,5 @@ socket.on('drawWhiteCard', function(data){
     createCard(playerHand, data)
 });
 
-createNamePlates(['Zack', 
-'Fuck you', 
-'Fuck you FUck you fuck you fuck you fuck you fuck youyou fuck you fuck youyou fuck you fuck yfuck you fuFuck you FUck you fuck you fuck you fuck you fuck youyou fuck you fuck youyou fuck you fuck yfuck you fuck you fuck you fuck youFuck you FUck you fuck you fuck you fuck you fuck youyou fuck you fuck youyou fuck you fuck yfuck you fuck you fuck you fuck youFuck you FUck you fuck you fuck you fuck you fuck youyou fuck you fuck youyou fuck you fuck yfuck you fuck you fuck you fuck youFuck you FUck you fuck you fuck you fuck you fuck youyou fuck you fuck youyou fuck you fuck yfuck you fuck you fuck you fuck youck you fuck you END',
- 'Fuck you',
- 'Horse. Horse Horse Horse Horse Horse Horse Horse horse WEWERERE RERERE fuck fuck fuck'])
+createNamePlates(['Zack', 'Beans', 'Taco', 'horse', 'horse', 
+])

@@ -34,9 +34,12 @@ function createCard(destination, cardContent, color){
     contentDiv.className = contentDivClass
     contentDiv.innerHTML = cardContent
     //Attempts to center content based on length of card content, 4.9 and 0.75 are magic numbers.
-    let dynamicPadding = 0
+    let dynamicPadding = 0.5
     if(contentHeight < 7){
         dynamicPadding = 4.9 - contentHeight*0.75
+    }
+    else{
+        contentDiv.style.fontSize = '1.2vw'
     }
     contentDiv.style.paddingTop = dynamicPadding + 'vw'
     //Appends cardContent into card div
