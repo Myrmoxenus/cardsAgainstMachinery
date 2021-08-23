@@ -1,51 +1,31 @@
 <!doctype html>
 
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <title>A Basic HTML5 Template</title>
-  <meta name="description" content="A simple HTML5 Template for new projects.">
-
-  <link rel="icon" href="/favicon.ico">
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-
+<head></head>
   <link rel="stylesheet" href="styles.css">
 
 </head>
 
 <body>
- 
-    <div id="informationPanel">
-      <div id="hiddenTestNameplate" class="namePlate">
-        <div class="namePlateContent"></div>
-        <div class="scoreContainer"></div>
-      </div>
-    </div>
-    
-    <div id="playTable"></div>
-    <button type="button" id="testButton">Test Button!</button>
-    <button type="button" id="testButton">Test Button!</button>
-    <button type="button" id="testButton">Test Button!</button>
-    <button type="button" id="testButton">Test Button!</button>
-    <div id="playerHand">
+  <h1>Hi dipshit.</h1>
 
-      <div id="hiddenTestCard" class="card">
-        <div id="testCardContent" class="cardContent"></div>
-      </div>
-  
 
-    </div>
 
-  
-    
 
-  <script type="text/javascript" src="cardCreator.js"></script>
+
+  <form action="/action_page.php">
+    <label for="fname">Name:</label>
+    <input type="text" id="screenNameInputBox" name="screenName"><br><br>
+    <label for="lname">Room Name:</label>
+    <input type="text" id="roomNameInputBox" name="roomName"><br><br>
+    <button type="button" id="joinGameButton">Join Game!</button>
+  </form>
+
+
+
+
+
   <script src="/socket.io/socket.io.js"></script>
-  <script type="text/javascript" src="script.js"></script>
-
- 
+  <script src="script.js"></script>
 </body>
 </html>

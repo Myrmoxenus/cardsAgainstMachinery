@@ -27,15 +27,24 @@ server.listen(PORT, () => {
   });
 
   function randomUpTo(randomMax) {
-    return ((Math.floor(Math.random() * (randomMax + 1))))
+    return ((Math.floor(Math.random() * (randomMax + 1))));
   }
   
 //Socket behavior
 io.on('connection', (socket) => {
 
+  /*
+  socket.on('joinGame', function(data){
+    let currentPlayer = ;
+  });*/
+
   socket.on('testButton', function(data){
     let emitData = whiteCardArray[randomUpTo(whiteCardArray.length-1)];
     io.sockets.emit('drawWhiteCard', emitData);
+  });
+
+  socket.on('joinGame', function(data){
+    console.log(data);
   });
 
     console.log('User connected with socketID: ' + socket.id);

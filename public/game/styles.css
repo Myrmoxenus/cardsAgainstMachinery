@@ -1,0 +1,160 @@
+
+body{
+
+    background: rgb(56,82,131);
+    background-image: linear-gradient(121deg, rgba(56,82,131,1) 0%, rgba(72,110,158,1) 37%, rgba(104,155,184,1));
+    margin: 0.8vw;
+    line-height: 1vw;
+    color: #303030;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    font-style: normal; 
+    font-variant: normal; 
+    font-weight: 400; 
+    line-height: 20px;
+}
+
+.card{
+    line-height: normal;
+    border-radius: 0.3vw;
+    width: 10vw;
+    padding-bottom: 10vw;
+    text-align: center;
+    display: inline-block;
+    position: relative;
+    margin: 0.2vw;
+    margin-top: 0vw;
+    user-select: none;
+}
+
+
+.cardContent {
+    padding-left: 0.8vw;
+    padding-right: 0.8vw;
+    font-size: 1.4vw;
+    margin: 0;
+    line-break: loose !important;
+    position: absolute;
+}
+
+
+.shortContent{
+    padding: 0 !important;
+
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%); 
+}
+
+.whiteCard{
+    background-color: #F6E8E0;
+    ;
+}
+
+.redCard{
+    background-color: #D84B59;
+    color: #F6E8E0;
+}
+
+.namePlate{
+    line-height: normal;
+    background-color:#F6E8E0;
+    margin: 0.5vw;
+    height: 9%;
+    width: 80%;
+    vertical-align: middle;
+    border-radius: 0.3vw;
+    overflow-y: hidden;
+    /*user-select: none;*/
+}
+
+.scoreContainer{
+   
+    height: 100%;
+    width: 15%;
+   display: inline-block;
+    background-color: #CCB9A1;
+    user-select: none;
+
+}
+.namePlateContent{
+    width: 80%;
+    height: 100%;
+    text-align: center;
+    display: inline-block;
+    overflow-x: hidden;
+    vertical-align: top;
+    font-size: 4vw;
+    color: #303030;
+
+}
+.namePlateContent::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.namePlateContent {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+#hiddenTestCard{
+    visibility: hidden;
+    z-index: -999;
+    position: absolute;
+}
+
+#hiddenTestNameplate{
+    visibility: hidden;
+    z-index: -999;
+    position: absolute;
+}
+
+#informationPanel{
+    /*background-color: #858585;*/
+    border-radius: 0.3vw;
+    margin: 0.5vw;
+    margin-top: 0vw;
+    height: 53vw;
+    width: 23.5vw;
+    position: absolute;
+    pointer-events:none;
+}
+
+#playerHand{
+    margin-left: auto;
+    margin-right: 0;
+    padding: 0.2vw;
+    height: 20.5vw;
+    width: 73vw;
+    overflow: hidden;
+}
+
+#testButton{
+    /*display: none*/
+    margin-left: auto;
+    margin-right: auto;
+    position: inline-block;
+    z-index: 10;
+}
+
+#playTable{
+    /*background-color: #858585;*/
+    margin-left: auto;
+    margin-right: 0;
+    border-radius: 0.3vw;
+    padding: 0.2vw;
+    padding-top: 0.4vw;
+    height: 31.3vw;
+    width: 72.5vw;
+    overflow: hidden;
+    margin-bottom: 0.3vw;
+    margin-top: 0;
+}
+
+@media only screen and (max-width: 4000px) {
+    body {
+        line-height: 1vw;
+    }
+  }
