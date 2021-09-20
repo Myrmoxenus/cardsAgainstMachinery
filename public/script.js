@@ -1,4 +1,4 @@
-var socket = io.connect('http://localhost:4433');
+const socket = io();
 
 
 let joinGameButton = document.getElementById('joinGameButton');
@@ -15,4 +15,8 @@ function joinGameButtonClick(){
         roomName: roomNameInput
     }
     socket.emit('joinGame', data);
+
+    //Redirects user to game with correct URL
+    let newURL = 'game/' + roomNameInput
+    window.location.replace(newURL)
 }

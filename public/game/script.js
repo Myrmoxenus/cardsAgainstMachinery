@@ -1,7 +1,4 @@
-
-
-const serverURL = 'http://localhost:4433';
-const socket = io.connect(serverURL);
+const socket = io();
 
 let playerHand = document.getElementById('playerHand');
 let playTable = document.getElementById('playTable');
@@ -47,12 +44,13 @@ function createNamePlates(nameArray){
 testButton.addEventListener('click', testButtonClick);
 
 function testButtonClick(){
-    socket.emit('testButton');
+    socket.emit('requestNewHand');
 }
 
 // Listen for events
-socket.on('drawWhiteCard', function(data){
-    createCard(playerHand, data)
+socket.on('newPlayerHand', function(data){
+    console.log(data)
+    data.forEach(card => createCard(playerHand, card))
 });
 
 createNamePlates(['Zack', 'Beans', 'Taco', 'horse', 'horse', 
