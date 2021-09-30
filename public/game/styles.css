@@ -14,6 +14,15 @@ body{
     line-height: 20px;
 }
 
+input {
+    background: transparent;
+    width: 80%;
+    height: 100%;
+    display: inline-block;
+    vertical-align: top;
+    font-size: 2vw;
+}
+
 .card{
     line-height: normal;
     border-radius: 0.3vw;
@@ -66,7 +75,7 @@ body{
     vertical-align: middle;
     border-radius: 0.3vw;
     overflow-y: hidden;
-    /*user-select: none;*/
+    user-select: none;
 }
 
 .scoreContainer{
@@ -87,6 +96,7 @@ body{
     vertical-align: top;
     font-size: 4vw;
     color: #303030;
+    /*pointer-events:none;*/
 
 }
 .namePlateContent::-webkit-scrollbar {
@@ -119,7 +129,7 @@ body{
     height: 53vw;
     width: 23.5vw;
     position: absolute;
-    pointer-events:none;
+   
 }
 
 #playerHand{
