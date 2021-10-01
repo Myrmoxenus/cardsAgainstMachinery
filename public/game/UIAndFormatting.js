@@ -48,3 +48,41 @@ function createCard(destination, cardContent, color){
     destination.appendChild(cardDiv)
 }
 
+function createNamePlate(name, score){
+    let namePlateDiv = document.createElement('div')
+    namePlateDiv.className = 'namePlate'
+    let namePlateContentDiv = document.createElement('div')
+    namePlateContentDiv.className = 'namePlateContent'
+    //Sets default font size
+    let namePlateFontSize = 2
+    
+    //Adjusts font size based on text length, using magic numbers
+    if(name.length > 40){
+        let extraTextLength = name.length - 40
+        let magicSlope = 1.62/name.length
+        namePlateFontSize = 2 - extraTextLength*magicSlope
+        if (namePlateFontSize < 0.2){
+            namePlateFontSize = 0.2
+        }
+    }
+    //If name length is especially long, makes nameplate scrollable
+    if(name.length>400){
+        namePlateContentDiv.style.overflowY='scroll'
+    }
+    namePlateContentDiv.style.fontSize = namePlateFontSize + 'vw'
+    namePlateContentDiv.innerHTML = name
+    
+    let scoreContainerDiv = document.createElement('div')
+    scoreContainerDiv.className = 'scoreContainer'
+    let scoreContentDiv = document.createElement('div')
+    scoreContentDiv.className = 'scoreContent'
+    scoreContainerDiv.appendChild(scoreContentDiv)
+    scoreContentDiv.innerHTML = score
+    
+    informationPanel.appendChild(namePlateDiv)
+    namePlateDiv.appendChild(namePlateContentDiv)
+    namePlateDiv.appendChild(scoreContainerDiv)
+
+
+
+}

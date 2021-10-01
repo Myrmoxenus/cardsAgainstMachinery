@@ -5,8 +5,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>A Basic HTML5 Template</title>
-  <meta name="description" content="A simple HTML5 Template for new projects.">
+  <title>Cards Against Machinery</title>
+  <meta name="description" content="Cards Against Machinery">
 
   <link rel="icon" href="/favicon.ico">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -25,11 +25,15 @@
       </div>
     </div>
     
+    <div id="buttonContainer">
+      <button type="button" id="drawHandButton">Draw Hand!</button>
+      <button type="button" id="testButton2">Test Button 2!</button>
+      <button type="button" id="testButton3">Test Button 3!</button>
+      <button type="button" id="testButton4">Test Button 4!</button>
+    </div>
+
     <div id="playTable"></div>
-    <button type="button" id="testButton">Test Button!</button>
-    <button type="button" id="testButton">Test Button!</button>
-    <button type="button" id="testButton">Test Button!</button>
-    <button type="button" id="testButton">Test Button!</button>
+
     <div id="playerHand">
 
       <div id="hiddenTestCard" class="card">
@@ -42,7 +46,7 @@
   
     
 
-  <script type="text/javascript" src="cardCreator.js"></script>
+  <script type="text/javascript" src="UIAndFormatting.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script type="text/javascript" src="script.js"></script>
 
