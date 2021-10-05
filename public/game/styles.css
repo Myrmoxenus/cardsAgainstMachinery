@@ -66,9 +66,33 @@ input {
     ;
 }
 
+.whiteCard:hover{
+    background-color: #CCB9A1;
+}
+
+.whiteCardSelected{
+    background-color: #CCB9A1;
+}
+
+.whiteCardLocked{
+    background-color: #CCB9A1;
+}
+
 .redCard{
     background-color: #D84B59;
     color: #F6E8E0;
+}
+
+.redCard:hover{
+    background-color: #904555;
+}
+
+.redCardSelected{
+    background-color: #904555;
+}
+
+.redCardLocked{
+    background-color: #904555;
 }
 
 .namePlate{
@@ -150,6 +174,14 @@ input {
     color: #F6E8E0;
 }
 
+/*add these later*/
+#cardCzarScoreContainer{
+    background-color: #904555;
+}
+
+#cardCzarScoreContent{
+    color: #F6E8E0;
+}
 #buttonContainer{
     margin-top: 54vw;
     position: absolute;

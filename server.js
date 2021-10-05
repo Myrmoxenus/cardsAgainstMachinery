@@ -55,6 +55,8 @@ class player {
     this.connected = true
     this.hadTurn = false
     this.currentCzar = false
+    this.submittedCardsThisTurn = false
+    this.submittedCards = []
   }
 }
 
@@ -66,6 +68,7 @@ class game {
     this.playersJoinedCount = 0
     this.players = []
     this.winningScore = 10
+    this.redCardCurrentlySubmitted = false
   }
   advanceTurn(){
     let connectedPlayers = this.players.filter(player => player.connected)
@@ -76,8 +79,7 @@ class game {
         previousCzar.currentCzar = false
       }
       if(newCzar){
-        newCzar.currentCzar = true
-        newCzar.hadTurn = true
+        setPlayerToCzar(newCzar)
       }
       else{
         this.players.forEach(player => 
@@ -100,6 +102,20 @@ class game {
 
 let gameMap = new Map()
 
+function setPlayerToCzar(player){
+  console.log(player.name + ' is now Card Czar')
+  player.currentCzar = true
+  player.hadTurn = true
+  let newRedCardArray = []
+        while(newRedCardArray.length < 18) {
+        newRedCardArray.push(redCardArray[randomUpTo(redCardArray.length-1)])
+        }
+  io.to(player.socketID).emit('newRedCards', newRedCardArray)
+  /*
+  let currentGame = gameMap.get(player.roomName)
+  io.to(currentGame.roomName).emit('updatePlayers', currentGame.players)*/
+}
+
 //Socket behavior
 io.on('connection', (socket) => {
 
@@ -111,47 +127,52 @@ io.on('connection', (socket) => {
     if(!currentGame){
       socket.emit('gameDoesNotExist')
     }
+    else if(currentGame.players.length >= 8){
+      //If there are too many players...
+      console.log('Too many players in ' + currentGame.roomName)
+    }
     else{
       let currentPlayer = currentGame.players.find(player => player.roundPlayerString === data.roundPlayerString)
       if(currentPlayer){
+        console.log('Player reconnect')
         playerMap.delete(currentPlayer.socketID)
         playerMap.set(socket.id, currentPlayer)
         currentPlayer.socketID = socket.id
         currentPlayer.connected = true
-        //Reconnect player
-        console.log('Player reconnect')
-        socket.join(currentGame.roomName)
-        io.to(currentGame.roomName).emit('updatePlayers', currentGame.players)
-        console.log(currentPlayer)
-      }
-      else if(currentGame.players.length >= 8){
-        //If there are too many players...
-        console.log('Too many players in ' + currentGame.roomName)
+        //If player is only player in room, set them to Card Czar
+        if(currentGame.players.length === 1){
+          setPlayerToCzar(currentPlayer)
+                
+          io.to(currentGame.roomName).emit('updatePlayers', currentGame.players)
+            }
       }
       else{
         //Creates new player
         console.log('New player')
         currentGame.playersJoinedCount += 1
-        let newPlayer = new player('Player ' + currentGame.playersJoinedCount, currentGame.roomName, socket.id)
-        playerMap.set(socket.id, newPlayer)
-        currentGame.players.push(newPlayer)
-        socket.emit('assignRoundPlayerString', newPlayer.roundPlayerString)
-        socket.join(currentGame.roomName)
+        let currentPlayer = new player('Player ' + currentGame.playersJoinedCount, currentGame.roomName, socket.id)
+        playerMap.set(socket.id, currentPlayer)
+        currentGame.players.push(currentPlayer)
+        socket.emit('assignRoundPlayerString', currentPlayer.roundPlayerString)
+        //If player is first player in room, set them to Card Czar
+        if(currentGame.players.length === 1){
+          setPlayerToCzar(currentPlayer)
+                
+          io.to(currentGame.roomName).emit('updatePlayers', currentGame.players)
+            }
       }
-  
-    //If player is first player in room, set them to Card Czar
-    if(currentGame.players.length === 1){
-    currentGame.players[0].currentCzar = true
-    currentGame.players[0].hadTurn = true
-          
-    io.to(currentGame.roomName).emit('updatePlayers', currentGame.players)
-      }
+
+      socket.join(currentGame.roomName)
+      io.to(currentGame.roomName).emit('updatePlayers', currentGame.players)
+    
+    
     }    
   })
 
   socket.on('requestNewHand', function(data){
     let newHandArray = []
-    while(newHandArray.length < 14) {
+    let maxHandSize = 14
+    while(newHandArray.length < maxHandSize) {
       newHandArray.push(whiteCardArray[randomUpTo(whiteCardArray.length-1)])
     }
     socket.emit('newPlayerHand', newHandArray) 
@@ -159,7 +180,8 @@ io.on('connection', (socket) => {
 
   socket.on('requestRedCards', function(data){
     let newRedCardArray = []
-    while(newRedCardArray.length < 18) {
+    let fullTableOfRedCards = 18
+    while(newRedCardArray.length < fullTableOfRedCards) {
       newRedCardArray.push(redCardArray[randomUpTo(redCardArray.length-1)])
     }
     socket.emit('newRedCards', newRedCardArray) 
@@ -174,6 +196,41 @@ io.on('connection', (socket) => {
     
   })
 
+
+  socket.on('cardSubmission', function(submittedCards){
+    let currentPlayer = playerMap.get(socket.id)
+    let currentGame = gameMap.get(currentPlayer.roomName)
+    let currentCzar = currentGame.players.find(player => player.currentCzar)
+
+    if(currentPlayer.currentCzar){
+      currentPlayer.submittedCardsThisTurn = true
+      currentGame.redCardCurrentlySubmitted = true
+      let redCardContent = submittedCards[0]
+      io.to(currentGame.roomName).emit('redCardSelection', redCardContent)
+    }
+    else if(currentGame.redCardCurrentlySubmitted && !currentPlayer.submittedCardsThisTurn){
+      currentPlayer.submittedCardsThisTurn = true
+      currentPlayer.submittedCards = submittedCards
+      let connectedPlayers = currentGame.players.filter(player => player.connected && !player.currentCzar)
+      if(connectedPlayers.every(player => player.submittedCardsThisTurn)){
+        let randomizedCardSubmissionArray = []
+        while(randomizedCardSubmissionArray.length < (currentGame.players.length-1)){
+          //Randomly selects a connected players cards and pushes it to radomizedCardSubmissionArray
+          let randomPlayerIndex = randomUpTo(connectedPlayers.length - 1)
+          let randomPlayer= connectedPlayers[randomPlayerIndex]
+          let randomCards = randomPlayer.submittedCards
+          randomizedCardSubmissionArray.push(randomCards)
+          //removes player from array
+          connectedPlayers.splice(randomPlayerIndex, 1)
+        }
+        io.to(currentCzar.socketID).emit('allPlayersSubmitted', randomizedCardSubmissionArray)
+      }
+      
+      io.to(currentGame.roomName).emit('playerSubmittedCards', submittedCards.length)
+    }
+
+  })
+
   socket.on('disconnect', () => {
     let currentPlayer = playerMap.get(socket.id)
     if(currentPlayer){
@@ -183,8 +240,7 @@ io.on('connection', (socket) => {
        //If only one player remains in the room, set them to Card Czar
        let connectedPlayers = currentGame.players.filter(player => player.connected)
        if(connectedPlayers.length === 1){
-        connectedPlayers[0].currentCzar = true
-        connectedPlayers[0].hadTurn = true
+        setPlayerToCzar(connectedPlayers[0])
       }
 
       io.to(currentGame.roomName).emit('updatePlayers', currentGame.players)

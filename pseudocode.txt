@@ -1,7 +1,0 @@
-User loads page.
-Page grabs URL to determine room, sends to server
-Server checks if game exists, if not, prompt asks if user would like to create game
-If player is connected to game
-Server checks if game has too many players, alerts user if so
-New players make game session keys and save them to local storage, these are refreshed every game
-If a user disconnects and reconnects, it will check local storage and reconnect you to your score 

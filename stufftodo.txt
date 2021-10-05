@@ -1,0 +1,6 @@
+Change score counter to update color as Card Czar
+Probably make that initial card lock cleaner
+Not entirely into the way the hand does or does not unlock yet. We'll see
+When you select white cards to submit, I want a number to appear on them denoting order.
+Does someone joining with a second tab fuck up the reconnecting? That's probably fixable.
+Card storage

@@ -5,6 +5,9 @@ let playerHand = document.getElementById('playerHand');
 let playTable = document.getElementById('playTable');
 let informationPanel = document.getElementById('informationPanel');
 
+//
+let mostRecentPlayerObject = {}
+
 //Grabs roomname from user's address
 let roomName =  window.location.toString().split('/')
 roomName = roomName[roomName.length - 1]
@@ -16,21 +19,100 @@ let onLoadData = {
 socket.emit('gamePageLoad', onLoadData)
 socket.emit('requestNewHand')
 
+lockCards(playerHand)
+//THISSUCKSANDISUGLY
+setTimeout(function() {
+    lockCards(playerHand)
+  }, 500);
+
 //Buttons and their event listeners
 
 
 let drawHandButton = document.getElementById('drawHandButton');
+let submitCardButton = document.getElementById('submitCardButton');
 
 function drawHandButtonClick(){
     socket.emit('requestNewHand');
 }
 
+function submitCardButtonClick(){
+    if(submissionArray){
+        socket.emit('cardSubmission', submissionArray);
+    }
+}
+
 drawHandButton.addEventListener('click', drawHandButtonClick);
+submitCardButton.addEventListener('click', submitCardButtonClick)
+
+
+//Where cards wait to be submitted
+let submissionArray = []
+
+//Function that causes a card to emit itself
+function selectCard(){
+    
+   let cardType = this.classList[1]
+   //Checks if the selected card is a red card, if so, it unselects previously selected redCards.
+   if(cardType === 'redCard'){
+       let previouslySelectedRedCard = document.getElementsByClassName('redCardSelected')[0]
+       if(previouslySelectedRedCard){
+        //'click's previously selected card to unselect it
+        previouslySelectedRedCard.click()
+       }
+   }
+   this.classList.add(cardType + 'Selected')
+   this.removeEventListener('click', selectCard)
+   this.addEventListener('click', unselectCard)
+   let cardContent = this.firstChild.innerHTML
+   submissionArray.push(cardContent) 
+
+}
+
+function unselectCard(){
+    let cardType = this.classList[1]
+    this.classList.remove(cardType + 'Selected')
+    this.removeEventListener('click', unselectCard)
+    this.addEventListener('click', selectCard)
+    let cardContent = this.firstChild.innerHTML
+    let submissionIndex = submissionArray.indexOf(cardContent);
+    submissionArray.splice(submissionIndex, 1)
+}
+
+function unlockCards(section){
+    let i = 0
+    //Adds an extra increment if playerHand, because has a hidden child for formatting
+    if (section.id === 'playerHand'){
+        i += 1
+    }
+
+    while(i < section.children.length){
+        section.children[i].addEventListener('click', selectCard)
+        let cardType =section.children[i].classList[1]
+        section.children[i].classList.remove(cardType + 'Locked')
+        i++
+    }
+}
+
+function lockCards(section){
+   for(let i = 0; i < section.children.length; i++){
+        section.children[i].removeEventListener('click', selectCard)
+        let cardType = section.children[i].classList[1]
+        section.children[i].classList.add(cardType + 'Locked')
+    }
+}
 
 
 
 
 // Listen for events
+
+socket.on('testoPresto', function(){
+    console.log('It worked, bitch')
+
+   
+})
+
+
 socket.on('gameDoesNotExist', function(){
     //Redirects user to the no game page if game doesn't already exist
     window.location.replace(window.location.origin + '/nogame/' + roomName)
@@ -43,10 +125,9 @@ socket.on('assignRoundPlayerString', function(roundPlayerString){
 
 socket.on('newPlayerHand', function(newHandArray){
     
-    while(playerHand.children[1]){
-        playerHand.removeChild(playerHand.children[1])
-    }
-    
+    //clears existing playerHand
+    clearSection(playerHand)
+
     newHandArray.forEach(card => createCard(playerHand, card))
 
 });
@@ -54,21 +135,39 @@ socket.on('newPlayerHand', function(newHandArray){
 socket.on('newRedCards', function(newRedCardsArray){
     
     newRedCardsArray.forEach(card => createCard(playTable, card, 'red'))
+    unlockCards(playTable)
+    lockCards(playerHand)
 
 });
 
+socket.on('redCardSelection', function(redCardContent){
+
+clearSection(playTable)
+createCard(playTable,redCardContent,'red')
+lockCards(playTable)
+if(redCardContent !== submissionArray[0]){
+    unlockCards(playerHand)
+}
+//THISPROBABLYISNTRIGHT
+submissionArray = []
+})
+
+socket.on('playerSubmittedCards', function(numberOfCards){
+    while(numberOfCards>0){
+        createCard(playTable)
+        numberOfCards -= 1
+    }
+})
+
+socket.on('allPlayersSubmitted', function(cardArray){
+    console.log(cardArray)
+})
+
 socket.on('updatePlayers', function(playerData){
     //Removes current name plates, skipping the invisible one used for formatting
-    while(informationPanel.children[1]){
-        informationPanel.removeChild(informationPanel.children[1])
-    }
+    clearSection(informationPanel)
 
     let connectedPlayers = playerData.filter(player => player.connected)
-
-    //clears playTable
-    while(playTable.children[0]){
-        playTable.removeChild(informationPanel.children[0])
-    }
 
     //Creates name plates from players in array
     connectedPlayers.forEach(player => {
@@ -95,10 +194,8 @@ socket.on('updatePlayers', function(playerData){
             }
 
             currentPlayerNamePlate.addEventListener('dblclick', namePlateDoubleClick)
-            if(player.currentCzar){
-                socket.emit('requestRedCards')
-            }
         }
+
         if(player.currentCzar){
             currentPlayerNamePlate.id = 'cardCzarNamePlate'
             currentPlayerNamePlate.firstChild.id = 'cardCzarNamePlateContent'

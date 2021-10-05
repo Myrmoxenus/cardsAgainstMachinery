@@ -78,11 +78,21 @@ function createNamePlate(name, score){
     scoreContentDiv.className = 'scoreContent'
     scoreContainerDiv.appendChild(scoreContentDiv)
     scoreContentDiv.innerHTML = score
-    
+
     informationPanel.appendChild(namePlateDiv)
     namePlateDiv.appendChild(namePlateContentDiv)
     namePlateDiv.appendChild(scoreContainerDiv)
 
+}
 
-
+//clears a section
+function clearSection(section){
+    let i = 0
+    //Adds an extra increment if informationPanel and playerHand, because have a hidden child for formatting
+    if (section.id === 'informationPanel' || section.id === 'playerHand'){
+        i += 1
+    }
+    while(section.children[i]){
+        section.removeChild(section.children[i])
+    }
 }
