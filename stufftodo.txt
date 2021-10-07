@@ -4,3 +4,8 @@ Not entirely into the way the hand does or does not unlock yet. We'll see
 When you select white cards to submit, I want a number to appear on them denoting order.
 Does someone joining with a second tab fuck up the reconnecting? That's probably fixable.
 Card storage
+Make it do the right thing when someone else tries to make the same game.
+Don't let Card Czar submit a red card to an empty lobby
+Wasn't making a singular reconnected player into Czar
+Make arrow button unselectable
+I don't care for the cards being locked/unlocked in the playTable when the Czar is picking the winner

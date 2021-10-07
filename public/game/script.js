@@ -1,9 +1,14 @@
+
 const socket = io();
 
 //Assigning elements from the DOM to variables
 let playerHand = document.getElementById('playerHand');
 let playTable = document.getElementById('playTable');
 let informationPanel = document.getElementById('informationPanel');
+let buttonContainer = document.getElementById('buttonContainer')
+//
+
+
 
 //
 let mostRecentPlayerObject = {}
@@ -18,18 +23,19 @@ let onLoadData = {
 }
 socket.emit('gamePageLoad', onLoadData)
 socket.emit('requestNewHand')
-
 lockCards(playerHand)
 //THISSUCKSANDISUGLY
 setTimeout(function() {
     lockCards(playerHand)
   }, 500);
 
+let submittedWhiteCardCandidates = []
 //Buttons and their event listeners
 
 
 let drawHandButton = document.getElementById('drawHandButton');
 let submitCardButton = document.getElementById('submitCardButton');
+let selectWinnerButton = document.getElementById('selectWinnerButton')
 
 function drawHandButtonClick(){
     socket.emit('requestNewHand');
@@ -41,9 +47,14 @@ function submitCardButtonClick(){
     }
 }
 
+function selectWinnerButtonClick(){
+    let winnerCards = submittedWhiteCardCandidates[0]
+    socket.emit('winnerSelected', winnerCards)
+}
+
 drawHandButton.addEventListener('click', drawHandButtonClick);
 submitCardButton.addEventListener('click', submitCardButtonClick)
-
+selectWinnerButton.addEventListener('click', selectWinnerButtonClick)
 
 //Where cards wait to be submitted
 let submissionArray = []
@@ -148,19 +159,73 @@ lockCards(playTable)
 if(redCardContent !== submissionArray[0]){
     unlockCards(playerHand)
 }
-//THISPROBABLYISNTRIGHT
+//THISPROBABLYISNTRIGHTT
 submissionArray = []
 })
 
 socket.on('playerSubmittedCards', function(numberOfCards){
     while(numberOfCards>0){
         createCard(playTable)
+        playTable.lastElementChild.classList.add('whiteCardLocked')
         numberOfCards -= 1
     }
 })
 
 socket.on('allPlayersSubmitted', function(cardArray){
-    console.log(cardArray)
+    submittedWhiteCardCandidates = cardArray
+})
+
+socket.on('makeArrows', function(){
+
+    function nextSubmission(){
+
+        socket.emit('nextArrow')
+    }
+
+    function previousSubmission(){
+
+        socket.emit('previousArrow')
+    }
+    
+    let backButton = document.createElement('img')
+    backButton.src = 'backButton.png'
+    backButton.id = 'backButton'
+    backButton.addEventListener('click', previousSubmission)
+    buttonContainer.appendChild(backButton)
+
+    let nextButton = document.createElement('img')
+    nextButton.src = 'nextButton.png'
+    nextButton.id = 'nextButton'
+    nextButton.addEventListener('click', nextSubmission)
+    buttonContainer.appendChild(nextButton)
+
+})
+
+socket.on('nextArrow', function(){
+    while(playTable.children[1]){
+        playTable.removeChild(playTable.children[1])
+    }
+    let currentlyDisplayed = submittedWhiteCardCandidates[0]
+    submittedWhiteCardCandidates = submittedWhiteCardCandidates.splice(1)
+    submittedWhiteCardCandidates.push(currentlyDisplayed)
+    submittedWhiteCardCandidates[0].forEach(card => createCard(playTable, card))
+})
+
+socket.on('previousArrow', function(){
+    while(playTable.children[1]){
+        playTable.removeChild(playTable.children[1])
+    }
+    let toBeDisplayed = submittedWhiteCardCandidates.pop()
+    submittedWhiteCardCandidates.unshift(toBeDisplayed)
+    submittedWhiteCardCandidates[0].forEach(card => createCard(playTable, card))
+})
+
+socket.on('newTurn', function(){
+    clearSection(playTable)
+    let nextButton  = document.getElementById('nextButton')
+    let backButton  = document.getElementById('backButton')
+    nextButton.remove()
+    backButton.remove()  
 })
 
 socket.on('updatePlayers', function(playerData){

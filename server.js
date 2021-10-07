@@ -7,6 +7,7 @@ const { Server } = require('socket.io')
 //Card Decks
 let whiteCardArray = require('./cards/GeneratedWhiteCards.js')
 let redCardArray = require('./cards/GeneratedRedCards.js')
+const { emit } = require('process')
 
 //Sets port to a value
 const PORT = process.env.PORT || 4433
@@ -87,11 +88,14 @@ class game {
           this.advanceTurn()
       }
       io.to(this.roomName).emit('updatePlayers', this.players)
+      //
+      io.to(this.roomName).emit('newTurn')
     }
 
   }
   newRound(){
     this.players.forEach(player => player.hadTurn = false)
+    //THISISFORSUREWRONG
     let winningPlayer =this.players.find(player => player.score >= this.winningScore)
     if(winningPlayer){
       io.to(this.roomName).emit('newRound', winningPlayer.name)
@@ -190,6 +194,7 @@ io.on('connection', (socket) => {
   socket.on('playerNameChange', function(newName){
     let currentPlayer = playerMap.get(socket.id)
     console.log(currentPlayer)
+
     let currentGame = gameMap.get(currentPlayer.roomName)
     currentPlayer.name = newName
     io.to(currentGame.roomName).emit('updatePlayers', currentGame.players)
@@ -223,13 +228,48 @@ io.on('connection', (socket) => {
           //removes player from array
           connectedPlayers.splice(randomPlayerIndex, 1)
         }
-        io.to(currentCzar.socketID).emit('allPlayersSubmitted', randomizedCardSubmissionArray)
+        io.to(currentGame.roomName).emit('allPlayersSubmitted', randomizedCardSubmissionArray)
+        //I'm not in love with this solution
+        io.to(currentCzar.socketID).emit('makeArrows')
       }
+
       
       io.to(currentGame.roomName).emit('playerSubmittedCards', submittedCards.length)
     }
 
   })
+
+  socket.on('nextArrow', () =>{
+    let currentPlayer = playerMap.get(socket.id)
+    if(currentPlayer.currentCzar){
+      io.to(currentPlayer.roomName).emit('nextArrow')
+    }
+    
+  })
+
+  socket.on('previousArrow', () =>{
+    let currentPlayer = playerMap.get(socket.id)
+    if(currentPlayer.currentCzar){
+      io.to(currentPlayer.roomName).emit('previousArrow')
+    }
+  })
+
+  socket.on('winnerSelected', function(winnerCards){
+    let currentPlayer = playerMap.get(socket.id)
+    if(currentPlayer.currentCzar){
+      let currentGame = gameMap.get(currentPlayer.roomName)
+      let winningPlayer = currentGame.players.find(player => 
+        player.submittedCards[0] === winnerCards[0])
+      winningPlayer.score += 1
+      console.log(winningPlayer.name + ' is the winner')
+      currentGame.players.forEach(player => {
+        player.submittedCards = []
+        player.submittedCardsThisTurn = false
+      })
+      currentGame.advanceTurn()
+    }
+  })
+ 
 
   socket.on('disconnect', () => {
     let currentPlayer = playerMap.get(socket.id)

@@ -92,6 +92,7 @@ function clearSection(section){
     if (section.id === 'informationPanel' || section.id === 'playerHand'){
         i += 1
     }
+
     while(section.children[i]){
         section.removeChild(section.children[i])
     }

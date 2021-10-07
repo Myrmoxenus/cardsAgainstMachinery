@@ -144,6 +144,24 @@ input {
     scrollbar-width: none;  /* Firefox */
 }
 
+#backButton{
+    position:fixed;
+    z-index: 99999;
+    left: 24vw;
+    top: 5vw;
+    height: 3vw;
+    user-select: none;
+}
+
+#nextButton{
+    position:fixed;
+    z-index: 99999;
+    left: 89.9vw;
+    top: 5vw;
+    height: 3vw;
+    user-select: none;
+}
+
 #hiddenTestCard{
     visibility: hidden;
     z-index: -999;
