@@ -88,8 +88,12 @@ class game {
           this.advanceTurn()
       }
       io.to(this.roomName).emit('updatePlayers', this.players)
-      //
-      io.to(this.roomName).emit('newTurn')
+      //Emits to each non-Czar to clear their playTable
+      connectedPlayers.forEach(player =>{
+        if(!player.currentCzar){
+          io.to(player.socketID).emit('clearTable')
+        }
+      })
     }
 
   }
@@ -216,6 +220,11 @@ io.on('connection', (socket) => {
     else if(currentGame.redCardCurrentlySubmitted && !currentPlayer.submittedCardsThisTurn){
       currentPlayer.submittedCardsThisTurn = true
       currentPlayer.submittedCards = submittedCards
+      let replacementWhiteCards = []
+      while(replacementWhiteCards.length < submittedCards.length){
+        replacementWhiteCards.push(whiteCardArray[randomUpTo(whiteCardArray.length-1)])
+      }
+      io.to(currentPlayer.socketID).emit('replacementWhiteCards', replacementWhiteCards)
       let connectedPlayers = currentGame.players.filter(player => player.connected && !player.currentCzar)
       if(connectedPlayers.every(player => player.submittedCardsThisTurn)){
         let randomizedCardSubmissionArray = []

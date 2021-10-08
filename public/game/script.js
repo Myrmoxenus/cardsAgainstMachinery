@@ -43,8 +43,16 @@ function drawHandButtonClick(){
 
 function submitCardButtonClick(){
     if(submissionArray){
+        let selectedCards = document.getElementsByClassName('whiteCardSelected')
+        if(selectedCards.length !== 0){
+            while(selectedCards[0]){
+                selectedCards[0].remove()
+            }
+        }
         socket.emit('cardSubmission', submissionArray);
     }
+    //THISPROBABLYISNTRIGHTT
+submissionArray = []
 }
 
 function selectWinnerButtonClick(){
@@ -145,6 +153,7 @@ socket.on('newPlayerHand', function(newHandArray){
 
 socket.on('newRedCards', function(newRedCardsArray){
     
+    clearSection(playTable)
     newRedCardsArray.forEach(card => createCard(playTable, card, 'red'))
     unlockCards(playTable)
     lockCards(playerHand)
@@ -159,8 +168,7 @@ lockCards(playTable)
 if(redCardContent !== submissionArray[0]){
     unlockCards(playerHand)
 }
-//THISPROBABLYISNTRIGHTT
-submissionArray = []
+
 })
 
 socket.on('playerSubmittedCards', function(numberOfCards){
@@ -171,6 +179,10 @@ socket.on('playerSubmittedCards', function(numberOfCards){
     }
 })
 
+socket.on('replacementWhiteCards', function(replacementCards){
+    replacementCards.forEach(card => createCard(playerHand, card))
+})
+
 socket.on('allPlayersSubmitted', function(cardArray){
     submittedWhiteCardCandidates = cardArray
 })
@@ -178,12 +190,10 @@ socket.on('allPlayersSubmitted', function(cardArray){
 socket.on('makeArrows', function(){
 
     function nextSubmission(){
-
         socket.emit('nextArrow')
     }
 
     function previousSubmission(){
-
         socket.emit('previousArrow')
     }
     
@@ -220,7 +230,7 @@ socket.on('previousArrow', function(){
     submittedWhiteCardCandidates[0].forEach(card => createCard(playTable, card))
 })
 
-socket.on('newTurn', function(){
+socket.on('clearTable', function(){
     clearSection(playTable)
     let nextButton  = document.getElementById('nextButton')
     let backButton  = document.getElementById('backButton')
