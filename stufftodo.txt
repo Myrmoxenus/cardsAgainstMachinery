@@ -11,3 +11,5 @@ Make arrow button unselectable
 I don't care for the cards being locked/unlocked in the playTable when the Czar is picking the winner
 Card Czar can resubmit a blank card after card submit, fix that
 Don't let game proceed with fewer than 3 players
+When a player submitted a white card, the red card changed. My guess is that the currentCzar wasn't set to false for some reason.
+Redrawn hand is unselectable

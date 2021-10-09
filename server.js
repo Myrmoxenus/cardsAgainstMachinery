@@ -7,7 +7,6 @@ const { Server } = require('socket.io')
 //Card Decks
 let whiteCardArray = require('./cards/GeneratedWhiteCards.js')
 let redCardArray = require('./cards/GeneratedRedCards.js')
-const { emit } = require('process')
 
 //Sets port to a value
 const PORT = process.env.PORT || 4433
@@ -80,6 +79,7 @@ class game {
         previousCzar.currentCzar = false
       }
       if(newCzar){
+        this.redCardCurrentlySubmitted = false
         setPlayerToCzar(newCzar)
       }
       else{
@@ -211,11 +211,12 @@ io.on('connection', (socket) => {
     let currentGame = gameMap.get(currentPlayer.roomName)
     let currentCzar = currentGame.players.find(player => player.currentCzar)
 
-    if(currentPlayer.currentCzar){
+    if(currentPlayer.currentCzar && !currentGame.redCardCurrentlySubmitted){
       currentPlayer.submittedCardsThisTurn = true
       currentGame.redCardCurrentlySubmitted = true
       let redCardContent = submittedCards[0]
       io.to(currentGame.roomName).emit('redCardSelection', redCardContent)
+      io.to(currentPlayer.socketID).emit('lockCzarsHand')
     }
     else if(currentGame.redCardCurrentlySubmitted && !currentPlayer.submittedCardsThisTurn){
       currentPlayer.submittedCardsThisTurn = true
@@ -225,6 +226,8 @@ io.on('connection', (socket) => {
         replacementWhiteCards.push(whiteCardArray[randomUpTo(whiteCardArray.length-1)])
       }
       io.to(currentPlayer.socketID).emit('replacementWhiteCards', replacementWhiteCards)
+      //
+      io.to(currentGame.roomName).emit('playerSubmittedCards', submittedCards.length)
       let connectedPlayers = currentGame.players.filter(player => player.connected && !player.currentCzar)
       if(connectedPlayers.every(player => player.submittedCardsThisTurn)){
         let randomizedCardSubmissionArray = []
@@ -243,9 +246,9 @@ io.on('connection', (socket) => {
       }
 
       
-      io.to(currentGame.roomName).emit('playerSubmittedCards', submittedCards.length)
+      //io.to(currentGame.roomName).emit('playerSubmittedCards', submittedCards.length)
     }
-
+    console.log(currentGame.players)
   })
 
   socket.on('nextArrow', () =>{

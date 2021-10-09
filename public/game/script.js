@@ -171,6 +171,11 @@ if(redCardContent !== submissionArray[0]){
 
 })
 
+socket.on('lockCzarsHand', function(){
+    lockCards(playerHand)
+})
+
+
 socket.on('playerSubmittedCards', function(numberOfCards){
     while(numberOfCards>0){
         createCard(playTable)
@@ -231,11 +236,12 @@ socket.on('previousArrow', function(){
 })
 
 socket.on('clearTable', function(){
+    lockCards(playerHand)
     clearSection(playTable)
     let nextButton  = document.getElementById('nextButton')
     let backButton  = document.getElementById('backButton')
     nextButton.remove()
-    backButton.remove()  
+    backButton.remove()
 })
 
 socket.on('updatePlayers', function(playerData){
