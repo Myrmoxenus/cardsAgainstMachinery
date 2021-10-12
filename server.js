@@ -199,7 +199,7 @@ io.on('connection', (socket) => {
       newHandArray.push(whiteCardArray[randomUpTo(whiteCardArray.length-1)])
     }
     socket.emit('newPlayerHand', newHandArray)
-    if(currentPlayer.submittedCardsThisTurn || currentPlayer.currentCzar){
+    if(currentPlayer && (currentPlayer.submittedCardsThisTurn || currentPlayer.currentCzar)){
       socket.emit('lockPlayerHand')
     }
   })
