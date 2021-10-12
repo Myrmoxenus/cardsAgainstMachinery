@@ -1,10 +1,3 @@
-Change score counter to update color as Card Czar
-Probably make that initial card lock cleaner
-Not entirely into the way the hand does or does not unlock yet. We'll see
-When you select white cards to submit, I want a number to appear on them denoting order.
-Does someone joining with a second tab fuck up the reconnecting? That's probably fixable.
-Card storage
-Make it do the right thing when someone else tries to make the same game.
 Don't let Card Czar submit a red card to an empty lobby
 Wasn't making a singular reconnected player into Czar
 Make arrow button unselectable
@@ -13,3 +6,20 @@ Card Czar can resubmit a blank card after card submit, fix that
 Don't let game proceed with fewer than 3 players
 When a player submitted a white card, the red card changed. My guess is that the currentCzar wasn't set to false for some reason.
 Redrawn hand is unselectable
+Games need to decay
+Winner declaration and new rounds, maybe add ticks to name plate for wins?
+Vote to skip
+Neat background lines
+Make icons for buttons and make the appearance of buttons conditional
+Card storage
+Purchase cardsagainstmachinery.com // This was a mistake
+Make previous name autofill the player name input when being modified
+Make employer friendly version
+Add database and like card learderboard
+Authenticate cards?
+Shuffling and card locking
+Maybe make it so it only sends you a new hand at the start of the next turn if you have an empty hand to not ahve to use a time delay
+Probably make that initial card lock cleaner
+Joining in a second tab should redirect rather than just crashing the thing.
+Make error redirects display more informative messages
+Password protect games?

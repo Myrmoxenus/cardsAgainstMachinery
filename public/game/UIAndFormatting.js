@@ -48,6 +48,7 @@ function createCard(destination, cardContent, color){
     destination.appendChild(cardDiv)
 }
 
+//Renders a namePlate
 function createNamePlate(name, score){
     let namePlateDiv = document.createElement('div')
     namePlateDiv.className = 'namePlate'

@@ -6,12 +6,7 @@ let playerHand = document.getElementById('playerHand');
 let playTable = document.getElementById('playTable');
 let informationPanel = document.getElementById('informationPanel');
 let buttonContainer = document.getElementById('buttonContainer')
-//
 
-
-
-//
-let mostRecentPlayerObject = {}
 
 //Grabs roomname from user's address
 let roomName =  window.location.toString().split('/')
@@ -23,19 +18,21 @@ let onLoadData = {
 }
 socket.emit('gamePageLoad', onLoadData)
 socket.emit('requestNewHand')
-lockCards(playerHand)
-//THISSUCKSANDISUGLY
+//Locks cards on a delay while it waits for the server to emit a hand to each player. I'm not in love with this.
 setTimeout(function() {
     lockCards(playerHand)
   }, 500);
 
+//An array that holds the all of the submitted white card candidates. This array is used to cycle through cards while cardCzar is selecting a winner
 let submittedWhiteCardCandidates = []
-//Buttons and their event listeners
 
+//Buttons from DOM assigned to variables
 
 let drawHandButton = document.getElementById('drawHandButton');
 let submitCardButton = document.getElementById('submitCardButton');
 let selectWinnerButton = document.getElementById('selectWinnerButton')
+
+//Button functions 
 
 function drawHandButtonClick(){
     socket.emit('requestNewHand');
@@ -43,6 +40,7 @@ function drawHandButtonClick(){
 
 function submitCardButtonClick(){
     if(submissionArray){
+        //If white cards are selected, removes them from player's hand on submission
         let selectedCards = document.getElementsByClassName('whiteCardSelected')
         if(selectedCards.length !== 0){
             while(selectedCards[0]){
@@ -51,23 +49,25 @@ function submitCardButtonClick(){
         }
         socket.emit('cardSubmission', submissionArray);
     }
-    //THISPROBABLYISNTRIGHTT
+//Clears submission array
 submissionArray = []
 }
 
+//Function for submitting the content of a selected card
 function selectWinnerButtonClick(){
     let winnerCards = submittedWhiteCardCandidates[0]
     socket.emit('winnerSelected', winnerCards)
 }
 
+//Adds event listeners to 
 drawHandButton.addEventListener('click', drawHandButtonClick);
 submitCardButton.addEventListener('click', submitCardButtonClick)
 selectWinnerButton.addEventListener('click', selectWinnerButtonClick)
 
-//Where cards wait to be submitted
+//Where selected cards are placed prior to being submitted
 let submissionArray = []
 
-//Function that causes a card to emit itself
+//Function that runs when a card has been selected
 function selectCard(){
     
    let cardType = this.classList[1]
@@ -79,6 +79,15 @@ function selectCard(){
         previouslySelectedRedCard.click()
        }
    }
+   else{
+       numberWhiteCards()
+       //
+       let submissionOrderNumber= document.createElement('div')
+       submissionOrderNumber.className = 'submissionOrderNumber'
+       submissionOrderNumberValue = submissionArray.length + 1
+       submissionOrderNumber.innerText = submissionOrderNumberValue
+       this.appendChild(submissionOrderNumber)
+   }
    this.classList.add(cardType + 'Selected')
    this.removeEventListener('click', selectCard)
    this.addEventListener('click', unselectCard)
@@ -87,6 +96,7 @@ function selectCard(){
 
 }
 
+//Function that allows a card to be unselected
 function unselectCard(){
     let cardType = this.classList[1]
     this.classList.remove(cardType + 'Selected')
@@ -95,7 +105,40 @@ function unselectCard(){
     let cardContent = this.firstChild.innerHTML
     let submissionIndex = submissionArray.indexOf(cardContent);
     submissionArray.splice(submissionIndex, 1)
+    if(cardType === 'whiteCard'){
+        numberWhiteCards()
+    }
 }
+
+function numberWhiteCards(){
+
+    function denumberWhiteCards(){
+        for(let i = 1; i<playerHand.children.length; i++){
+        let submissionOrderNumberDiv = playerHand.children[i].children[1]
+            if(submissionOrderNumberDiv){
+                submissionOrderNumberDiv.remove()
+            }
+        }
+    }
+
+    denumberWhiteCards()
+
+    submissionArray.forEach(submissionArrayCard => {
+        for(let i = 1; i<playerHand.children.length; i++){
+            let handCard = playerHand.children[i]
+            let handCardContent = handCard.firstChild.innerHTML
+            if(handCardContent === submissionArrayCard){
+                let submissionOrderNumber= document.createElement('div')
+                submissionOrderNumber.className = 'submissionOrderNumber'
+                submissionOrderNumberValue = submissionArray.indexOf(submissionArrayCard) + 1
+                submissionOrderNumber.innerText = submissionOrderNumberValue
+                handCard.appendChild(submissionOrderNumber)
+            }
+        }
+    })
+}
+
+//Functions for unlocking and locking cards, indicating a player can not currently submit cards
 
 function unlockCards(section){
     let i = 0
@@ -122,35 +165,41 @@ function lockCards(section){
 
 
 
-
-// Listen for events
-
-socket.on('testoPresto', function(){
-    console.log('It worked, bitch')
-
-   
-})
-
+// Socket behavior
 
 socket.on('gameDoesNotExist', function(){
     //Redirects user to the no game page if game doesn't already exist
     window.location.replace(window.location.origin + '/nogame/' + roomName)
 })
 
+socket.on('gameHasTooManyPlayers', function(){
+    //Redirects user to the no game page if game has too many players
+    window.location.replace(window.location.origin + '/nogame/' + roomName)
+})
+
+socket.on('alreadyConnectedToGame', function(){
+    //Redirects user to the no game page if player is already connected
+    window.location.replace(window.location.origin + '/nogame/' + roomName)
+})
+
+
 socket.on('assignRoundPlayerString', function(roundPlayerString){
     //Sets player's round specific key
     window.localStorage.setItem('roundPlayerString', roundPlayerString)
 })
 
+//Replaces player hand with cards from server
 socket.on('newPlayerHand', function(newHandArray){
     
     //clears existing playerHand
     clearSection(playerHand)
-
     newHandArray.forEach(card => createCard(playerHand, card))
+    //Adds the card select event listeners
+    unlockCards(playerHand)
 
 });
 
+//Produces red card candidates from cards from server
 socket.on('newRedCards', function(newRedCardsArray){
     
     clearSection(playTable)
@@ -160,22 +209,25 @@ socket.on('newRedCards', function(newRedCardsArray){
 
 });
 
+//Handles the selection of a red card
 socket.on('redCardSelection', function(redCardContent){
 
 clearSection(playTable)
 createCard(playTable,redCardContent,'red')
 lockCards(playTable)
+//If the player was not the Czar and therefore does not have a red card currently sitting in their submission array, it unlocks their hand to allow them to submit cards
 if(redCardContent !== submissionArray[0]){
     unlockCards(playerHand)
 }
 
 })
 
-socket.on('lockCzarsHand', function(){
+//Locks player hand when signaled from the server 
+socket.on('lockPlayerHand', function(){
     lockCards(playerHand)
 })
 
-
+//Displays cards 'face down' as they're submitted as a visual cue to players having submitted
 socket.on('playerSubmittedCards', function(numberOfCards){
     while(numberOfCards>0){
         createCard(playTable)
@@ -184,14 +236,17 @@ socket.on('playerSubmittedCards', function(numberOfCards){
     }
 })
 
+//Replenishes submitted white cards into a players hand
 socket.on('replacementWhiteCards', function(replacementCards){
     replacementCards.forEach(card => createCard(playerHand, card))
 })
 
+//Sets the submittedWhiteCardCandidates array to the array randomized and sent from the server
 socket.on('allPlayersSubmitted', function(cardArray){
     submittedWhiteCardCandidates = cardArray
 })
 
+//Creates arrows that allows the cardCzar to cycle all players through white card submissions
 socket.on('makeArrows', function(){
 
     function nextSubmission(){
@@ -216,6 +271,7 @@ socket.on('makeArrows', function(){
 
 })
 
+//Functions that run when the cardCzar has pressed an arrow, cycling all players through the white card submissions
 socket.on('nextArrow', function(){
     while(playTable.children[1]){
         playTable.removeChild(playTable.children[1])
@@ -235,6 +291,7 @@ socket.on('previousArrow', function(){
     submittedWhiteCardCandidates[0].forEach(card => createCard(playTable, card))
 })
 
+//Clears the playTable of redCards and whiteCard candidates. Removes the arrows if applicable
 socket.on('clearTable', function(){
     lockCards(playerHand)
     clearSection(playTable)
@@ -244,6 +301,7 @@ socket.on('clearTable', function(){
     backButton.remove()
 })
 
+//Updates player nameplates on new player joins, score changes, and player name changes
 socket.on('updatePlayers', function(playerData){
     //Removes current name plates, skipping the invisible one used for formatting
     clearSection(informationPanel)
@@ -280,6 +338,8 @@ socket.on('updatePlayers', function(playerData){
         if(player.currentCzar){
             currentPlayerNamePlate.id = 'cardCzarNamePlate'
             currentPlayerNamePlate.firstChild.id = 'cardCzarNamePlateContent'
+            currentPlayerNamePlate.children[1].id = 'cardCzarScoreContainer'
+            currentPlayerNamePlate.children[1].firstChild.id  = 'cardCzarScoreContent'
         }
         })
     

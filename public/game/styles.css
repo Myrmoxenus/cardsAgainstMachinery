@@ -74,6 +74,14 @@ input {
     background-color: #CCB9A1;
 }
 
+.submissionOrderNumber{
+    color: #F6E8E0;
+    position: absolute;
+    left: 0.5vw;
+    top: 0.5vw;
+    font-weight: bold;
+}
+
 .whiteCardLocked{
     background-color: #CCB9A1;
 }
