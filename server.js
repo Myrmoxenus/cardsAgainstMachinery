@@ -85,10 +85,12 @@ class game {
     this.players = []
     this.winningScore = 10
     this.redCardCurrentlySubmitted = false
+    this.timeOfLastTurn = new Date()
   }
   //Advances the game turn
   advanceTurn(){
     let connectedPlayers = this.players.filter(player => player.connected)
+    this.timeOfLastTurn = new Date()
     if(connectedPlayers.length > 1){
       let previousCzar = connectedPlayers.find(player => player.currentCzar)
       let newCzar = connectedPlayers.find(player => !player.hadTurn)
@@ -360,3 +362,26 @@ app.get('/nogame/:roomName', function(req, res){
 app.get('*', function(req, res){
   res.sendFile(path.join(__dirname, 'public', 'index.html'))
 })
+
+
+//Function checks every hour if a game has been inactive for more than an hour, it removes it from the map.
+function gameKiller(){
+  let killGameInterval = 1000*60*60
+  setTimeout(function(){
+    
+    let currentTime = new Date()
+    //Lifespan set to an hour
+    let inactiveLifespan = 1000*60*60
+    gameMap.forEach(game => {
+      if((currentTime - game.timeOfLastTurn) > inactiveLifespan){
+        console.log('Killing ' + game.roomName)
+        gameMap.delete(game.roomName)
+      }
+    })
+    console.log(gameMap)
+    gameKiller()
+  }, killGameInterval)
+  
+}
+
+gameKiller()
