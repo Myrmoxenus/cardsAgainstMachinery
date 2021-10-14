@@ -110,9 +110,11 @@ input {
     height: 9%;
     width: 80%;
     vertical-align: middle;
-    border-radius: 0.3vw;
+    /*border-radius: 0.3vw;*/
     overflow-y: hidden;
     user-select: none;
+    clip-path: polygon(7% 0, 100% 0, 100% 75%, 93% 100%, 0 100%, 0 25%);
+
 }
 
 .scoreContainer{

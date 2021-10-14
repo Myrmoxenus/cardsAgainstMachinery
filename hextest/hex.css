@@ -1,0 +1,93 @@
+
+body{
+
+    background: #4E576B;
+
+    font-family: Futura,"Trebuchet MS",Helvetica,Arial,sans-serif; 
+
+}
+.card{
+    line-height: normal;
+    width: 10vw;
+
+    padding-bottom: 10vw;
+    text-align: center;
+    display: inline-block;
+    position: relative;
+    margin: 0.2vw;
+    margin-top: 0vw;
+    margin-bottom: -2.2vw;
+    user-select: none;
+    background-color: #F7D04D;
+    clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+    animation: hexagonRender 0.55s ease;
+
+}
+
+.card:hover{
+    background-color: #CB823D;
+    /*animation: darken 0.75s ease;*/
+}
+
+.cardContent {
+
+    font-size: 1.4vw;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%); 
+    animation: textFade 0.75s ease;
+}
+
+#playerHand{
+    font-size: 0; /* disable white space between inline block element */
+    margin-right: 0;
+    padding: 0.2vw;
+    height: 20.5vw;
+    width: 73vw;
+
+}
+
+#playerHand .card:nth-child(n + 8){
+    transform: translate(5.25vw);
+}
+
+@keyframes hexagonRender {
+    0% {
+        opacity: 0;
+        left: -10vw;
+        clip-path: polygon(10% 0, 10% 0, 10% 10%, 0% 10%, 0 10%, 0 0);
+        background-color: #CB823D;
+
+    }
+    45%{
+        clip-path: polygon(10% 0, 10% 0, 10% 10%, 0% 10%, 0 10%, 0 0);
+    }
+    60% {
+        opacity: 1;
+        left: 0;
+        
+
+    }
+    70%{
+        background-color: #CB823D;
+    }
+
+}
+
+@keyframes textFade {
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 0;
+    }
+}
+
+@keyframes darken {
+    0% {
+       background-color:#F7D04D
+    }
+}
