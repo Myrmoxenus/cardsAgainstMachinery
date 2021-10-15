@@ -1,13 +1,6 @@
-Don't let Card Czar submit a red card to an empty lobby
-Wasn't making a singular reconnected player into Czar
-Make arrow button unselectable
-I don't care for the cards being locked/unlocked in the playTable when the Czar is picking the winner
-Card Czar can resubmit a blank card after card submit, fix that
-Don't let game proceed with fewer than 3 players
-When a player submitted a white card, the red card changed. My guess is that the currentCzar wasn't set to false for some reason.
-Redrawn hand is unselectable
-Games need to decay
 Winner declaration and new rounds, maybe add ticks to name plate for wins?
+Isn't responsive on mozilla for some reason
+Submitting and drawing cards before game has started.
 Vote to skip
 Neat background lines
 Make icons for buttons and make the appearance of buttons conditional
@@ -23,3 +16,5 @@ Probably make that initial card lock cleaner
 Joining in a second tab should redirect rather than just crashing the thing.
 Make error redirects display more informative messages
 Password protect games?
+Space between cards in playerhand and playtable are different
+If a game becomes fewer than 3 players it needs to not proceed

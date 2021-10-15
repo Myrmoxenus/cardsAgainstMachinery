@@ -82,18 +82,18 @@ function createCard(destination, cardContent, color){
         contentDivClass += ' shortContent'
      }
      else if(contentHeight === 2){
-         dynamicPadding = 3.5
+         dynamicPadding = 3.3
      }
      
      else if(contentHeight === 3){
-        dynamicPadding = 2.7
+        dynamicPadding = 2.5
     }
 
     else if(contentHeight === 4 && fontSize < 1.2){
-        dynamicPadding = 2.8
+        dynamicPadding = 2.6
     }
     else if(contentHeight === 5 && fontSize < 1){
-        dynamicPadding = 2.6
+        dynamicPadding = 2.4
     }
      /*else if(contentHeight < 5 && fontSize >= 1.2){
         dynamicPadding = 4.9 - contentHeight*0.6*/
