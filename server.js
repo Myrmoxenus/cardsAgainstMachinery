@@ -60,6 +60,7 @@ class player {
     this.currentCzar = false
     this.submittedCardsThisTurn = false
     this.submittedCards = []
+    this.drewCardsThisTurn = false
   }
   //Sets the player to current Czar
   setPlayerToCzar(){
@@ -67,7 +68,7 @@ class player {
     this.currentCzar = true
     this.hadTurn = true
     let newRedCardArray = []
-          while(newRedCardArray.length < 18) {
+          while(newRedCardArray.length < 14) {
           newRedCardArray.push(redCardArray[randomUpTo(redCardArray.length-1)])
           }
     io.to(this.socketID).emit('newRedCards', newRedCardArray)
@@ -195,21 +196,33 @@ io.on('connection', (socket) => {
   socket.on('requestNewHand', function(data){
     console.log('New hand!')
     let currentPlayer = playerMap.get(socket.id)
-    let newHandArray = []
-    let maxHandSize = 14
-    while(newHandArray.length < maxHandSize) {
-      newHandArray.push(whiteCardArray[randomUpTo(whiteCardArray.length-1)])
+    if(currentPlayer && currentPlayer.currentCzar){
+      let newRedCardArray = []
+      let fullTableOfRedCards = 14
+      while(newRedCardArray.length < fullTableOfRedCards) {
+        newRedCardArray.push(redCardArray[randomUpTo(redCardArray.length-1)])
+      }
+      socket.emit('newRedCards', newRedCardArray) 
     }
-    socket.emit('newPlayerHand', newHandArray)
-    if(currentPlayer && (currentPlayer.submittedCardsThisTurn || currentPlayer.currentCzar)){
-      socket.emit('lockPlayerHand')
+    else if(currentPlayer && !currentPlayer.drewCardsThisTurn){
+      currentPlayer.drewCardsThisTurn = true
+      let newHandArray = []
+      let maxHandSize = 14
+      while(newHandArray.length < maxHandSize) {
+        newHandArray.push(whiteCardArray[randomUpTo(whiteCardArray.length-1)])
+      }
+      socket.emit('newPlayerHand', newHandArray)
+      if(currentPlayer && (currentPlayer.submittedCardsThisTurn || currentPlayer.currentCzar)){
+        socket.emit('lockPlayerHand')
+      }
     }
+
   })
 
   //Responds to client request for red cards during player's cardCzar turn
   socket.on('requestRedCards', function(data){
     let newRedCardArray = []
-    let fullTableOfRedCards = 18
+    let fullTableOfRedCards = 14
     while(newRedCardArray.length < fullTableOfRedCards) {
       newRedCardArray.push(redCardArray[randomUpTo(redCardArray.length-1)])
     }
@@ -292,9 +305,9 @@ io.on('connection', (socket) => {
 //Responds to the cardCzar selecting a winner
   socket.on('winnerSelected', function(winnerCards){
     let currentPlayer = playerMap.get(socket.id)
+    let currentGame = gameMap.get(currentPlayer.roomName)
     //Authenticates that the winner selection emission is from the cardCzar
-    if(currentPlayer.currentCzar){
-      let currentGame = gameMap.get(currentPlayer.roomName)
+    if(currentPlayer.currentCzar && currentGame.redCardCurrentlySubmitted && winnerCards){
       let winningPlayer = currentGame.players.find(player => 
         player.submittedCards[0] === winnerCards[0])
       winningPlayer.score += 1
@@ -302,6 +315,7 @@ io.on('connection', (socket) => {
       currentGame.players.forEach(player => {
         player.submittedCards = []
         player.submittedCardsThisTurn = false
+        player.drewCardsThisTurn = false
       })
       currentGame.advanceTurn()
     }
