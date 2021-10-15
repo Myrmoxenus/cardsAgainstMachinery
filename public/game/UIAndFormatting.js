@@ -50,7 +50,7 @@ function generatePadding(cardContent, fontSize){
     testCardContent.innerHTML = cardContent
     testCardContent.style.fontSize = fontSize + 'vw'
     let unitConversion = convertUnits()
-    let desiredHeight = 0.8*testCard.clientHeight
+    let desiredHeight = 0.7*testCard.clientHeight
     let currentHeight = testCardContent.clientHeight
     if(currentHeight < desiredHeight){
         return (desiredHeight - currentHeight)/unitConversion
@@ -82,11 +82,11 @@ function createCard(destination, cardContent, color){
         contentDivClass += ' shortContent'
      }
      else if(contentHeight === 2){
-         dynamicPadding = 3.3
+         dynamicPadding = 3.1
      }
      
      else if(contentHeight === 3){
-        dynamicPadding = 2.5
+        dynamicPadding = 2.3
     }
 
     else if(contentHeight === 4 && fontSize < 1.2){

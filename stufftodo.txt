@@ -1,3 +1,4 @@
+Does the game break if a player leaves before submitting a white card
 Winner declaration and new rounds, maybe add ticks to name plate for wins?
 Isn't responsive on mozilla for some reason
 Submitting and drawing cards before game has started.

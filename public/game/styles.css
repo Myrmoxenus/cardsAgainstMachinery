@@ -120,7 +120,7 @@ input {
     /*border-radius: 0.3vw;*/
     overflow-y: hidden;
     user-select: none;
-    clip-path: polygon(7% 0, 100% 0, 100% 75%, 93% 100%, 0 100%, 0 25%);
+    clip-path: polygon(10% 0, 100% 0, 100% 75%, 90% 100%, 0 100%, 0 25%);
 
 }
 
@@ -134,7 +134,7 @@ input {
 }
 .scoreContent{
     color: #303030;
-    padding-top: 42%;
+    padding-top: 31%;
     font-size: 2vw;
     text-align: center;
 }
