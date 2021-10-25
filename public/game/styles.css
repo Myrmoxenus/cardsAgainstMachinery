@@ -83,10 +83,12 @@ input {
 
 .submissionOrderNumber{
     color: #F6E8E0;
+
     position: absolute;
-    left: 0.5vw;
-    top: 0.5vw;
+    left: 3.85vw;
+    font-size: 1.8vw;
     font-weight: bold;
+
 }
 
 .whiteCardLocked{

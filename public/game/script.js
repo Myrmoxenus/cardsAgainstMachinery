@@ -31,7 +31,7 @@ let submittedWhiteCardCandidates = []
 let drawHandButton = document.getElementById('drawHandButton');
 let submitCardButton = document.getElementById('submitCardButton');
 let selectWinnerButton = document.getElementById('selectWinnerButton')
-
+let voteToSkipButton = document.getElementById('voteToSkipButton')
 //Button functions 
 
 function drawHandButtonClick(){
@@ -59,10 +59,16 @@ function selectWinnerButtonClick(){
     socket.emit('winnerSelected', winnerCards)
 }
 
+//Function for voting to skip
+function voteToSkipButtonClick(){
+    socket.emit('votedToSkip')
+}
+
 //Adds event listeners to 
 drawHandButton.addEventListener('click', drawHandButtonClick);
 submitCardButton.addEventListener('click', submitCardButtonClick)
 selectWinnerButton.addEventListener('click', selectWinnerButtonClick)
+voteToSkipButton.addEventListener('click', voteToSkipButtonClick)
 
 //Where selected cards are placed prior to being submitted
 let submissionArray = []
@@ -322,6 +328,7 @@ socket.on('updatePlayers', function(playerData){
                 
                 let currentNamePlateContent = this.children[0]
                 let temporaryInputBox = document.createElement('input')
+                temporaryInputBox.value = currentNamePlateContent.innerHTML
                 temporaryInputBox.addEventListener('keyup', function(event){
                     if (event.code === 'Enter') {
                         socket.emit('playerNameChange', this.value)

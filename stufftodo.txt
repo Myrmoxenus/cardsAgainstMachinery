@@ -1,21 +1,25 @@
-Does the game break if a player leaves before submitting a white card
-Winner declaration and new rounds, maybe add ticks to name plate for wins?
-Isn't responsive on mozilla for some reason
-Submitting and drawing cards before game has started.
-Vote to skip
+Card storage
+You should not get in a situation where your hand is empty
+conditional button rendering
 Neat background lines
 Make icons for buttons and make the appearance of buttons conditional
-Card storage
-Purchase cardsagainstmachinery.com // This was a mistake
-Make previous name autofill the player name input when being modified
-Make employer friendly version
-Add database and like card learderboard
+
 Authenticate cards?
-Shuffling and card locking
+
 Maybe make it so it only sends you a new hand at the start of the next turn if you have an empty hand to not ahve to use a time delay
 Probably make that initial card lock cleaner
+randomizedSelectionArray code could be condensed into one function
+
+Winner declaration and new rounds, maybe add ticks to name plate for wins?
+
 Joining in a second tab should redirect rather than just crashing the thing.
 Make error redirects display more informative messages
 Password protect games?
 Space between cards in playerhand and playtable are different
 If a game becomes fewer than 3 players it needs to not proceed
+Isn't responsive on mozilla for some reason
+
+
+Later priorities:
+Make employer friendly version
+Add database and like card learderboard

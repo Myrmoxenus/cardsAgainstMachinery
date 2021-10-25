@@ -61,6 +61,7 @@ class player {
     this.submittedCardsThisTurn = false
     this.submittedCards = []
     this.drewCardsThisTurn = false
+    this.votedToSkip = false
   }
   //Sets the player to current Czar
   setPlayerToCzar(){
@@ -90,6 +91,12 @@ class game {
   }
   //Advances the game turn
   advanceTurn(){
+    this.players.forEach(player => {
+      player.submittedCards = []
+      player.submittedCardsThisTurn = false
+      player.drewCardsThisTurn = false
+      player.votedToSkip = false
+    })
     let connectedPlayers = this.players.filter(player => player.connected)
     this.timeOfLastTurn = new Date()
     if(connectedPlayers.length > 1){
@@ -232,7 +239,6 @@ io.on('connection', (socket) => {
   //Responds to a player changing their name in the client and emits that change to all players in current game
   socket.on('playerNameChange', function(newName){
     let currentPlayer = playerMap.get(socket.id)
-    console.log(currentPlayer)
 
     let currentGame = gameMap.get(currentPlayer.roomName)
     currentPlayer.name = newName
@@ -285,7 +291,7 @@ io.on('connection', (socket) => {
     }
    //Signals the client to lock a player's hand after they have submitted cards
     io.to(currentPlayer.socketID).emit('lockPlayerHand')
-    console.log(currentGame.players)
+
   })
 
   //Responds to cardCzar cylcing forwards and backwards through card submissions respectively, emits to all clients to adjust and render from their arrays accordingly
@@ -312,15 +318,46 @@ io.on('connection', (socket) => {
         player.submittedCards[0] === winnerCards[0])
       winningPlayer.score += 1
       console.log(winningPlayer.name + ' is the winner')
-      currentGame.players.forEach(player => {
-        player.submittedCards = []
-        player.submittedCardsThisTurn = false
-        player.drewCardsThisTurn = false
-      })
+ 
       currentGame.advanceTurn()
     }
   })
- 
+
+  socket.on('votedToSkip', () =>{
+    let currentPlayer = playerMap.get(socket.id)
+    let currentGame = gameMap.get(currentPlayer.roomName)
+    currentPlayer.votedToSkip = true
+    let connectedPlayers = currentGame.players.filter(player => player.connected)
+    let playersThatVotedToSkip = connectedPlayers.filter(player => player.votedToSkip)
+    console.log(currentPlayer.name + ' voted to skip.' + playersThatVotedToSkip.length + '/' + connectedPlayers.length + ' players have voted to skip.')
+    //If at least half of players vote to skip, turn advances
+    if(playersThatVotedToSkip.length >= connectedPlayers.length/2){
+      if(!currentGame.redCardCurrentlySubmitted){
+        currentGame.advanceTurn()
+      }
+      else{
+        let currentCzar = currentGame.players.find(player => player.currentCzar)
+        let randomizedCardSubmissionArray = []
+          while(randomizedCardSubmissionArray.length < connectedPlayers.length){
+            //Randomly selects a connected players cards and pushes it to radomizedCardSubmissionArray
+            let randomPlayerIndex = randomUpTo(connectedPlayers.length - 1)
+            console.log('randomPlayerIndex: ' + randomPlayerIndex)
+            let randomPlayer = connectedPlayers[randomPlayerIndex]
+            console.log(randomPlayer)
+            let randomCards = randomPlayer.submittedCards
+            if(randomCards[0]){
+              randomizedCardSubmissionArray.push(randomCards)
+            }
+            //removes player from array
+            connectedPlayers.splice(randomPlayerIndex, 1)
+          }
+          io.to(currentGame.roomName).emit('allPlayersSubmitted', randomizedCardSubmissionArray)
+          //Signals to the cardCzar client to create the next and previous arrows for cycling through submitted white card candidates
+          io.to(currentCzar.socketID).emit('makeArrows')
+      }
+    }
+    
+  })
 
   //Handles player disconnections
   socket.on('disconnect', () => {
@@ -341,6 +378,31 @@ io.on('connection', (socket) => {
         currentPlayer.currentCzar = false
         currentPlayer.hadTurn = true
         currentGame.advanceTurn()
+      }
+
+      else if(currentGame.redCardCurrentlySubmitted){
+        console.log('Player disconnected during card submission phase')
+        let currentGame = gameMap.get(currentPlayer.roomName)
+        let currentCzar = currentGame.players.find(player => player.currentCzar)
+        let connectedPlayers = currentGame.players.filter(player => player.connected && !player.currentCzar)
+        if(connectedPlayers.every(player => player.submittedCardsThisTurn)){
+          console.log(connectedPlayers)
+          let randomizedCardSubmissionArray = []
+          while(randomizedCardSubmissionArray.length < connectedPlayers.length){
+            //Randomly selects a connected players cards and pushes it to radomizedCardSubmissionArray
+            let randomPlayerIndex = randomUpTo(connectedPlayers.length - 1)
+            console.log('randomPlayerIndex: ' + randomPlayerIndex)
+            let randomPlayer = connectedPlayers[randomPlayerIndex]
+            console.log(randomPlayer)
+            let randomCards = randomPlayer.submittedCards
+            randomizedCardSubmissionArray.push(randomCards)
+            //removes player from array
+            connectedPlayers.splice(randomPlayerIndex, 1)
+          }
+          io.to(currentGame.roomName).emit('allPlayersSubmitted', randomizedCardSubmissionArray)
+          //Signals to the cardCzar client to create the next and previous arrows for cycling through submitted white card candidates
+          io.to(currentCzar.socketID).emit('makeArrows')
+        }
       }
     }
     
@@ -392,7 +454,7 @@ function gameKiller(){
         gameMap.delete(game.roomName)
       }
     })
-    console.log(gameMap)
+
     gameKiller()
   }, killGameInterval)
   
