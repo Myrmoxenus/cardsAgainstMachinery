@@ -85,7 +85,11 @@ input {
     color: #F6E8E0;
 
     position: absolute;
-    left: 3.85vw;
+    left:0;
+    right:0;
+  
+    margin-left: auto;
+    margin-right: auto;
     font-size: 1.8vw;
     font-weight: bold;
 
