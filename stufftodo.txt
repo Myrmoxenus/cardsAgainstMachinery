@@ -1,25 +1,31 @@
+
+Red Card Editing
 Card storage
 You should not get in a situation where your hand is empty
 conditional button rendering
+card width rendering
 Neat background lines
 Make icons for buttons and make the appearance of buttons conditional
+If a game becomes fewer than 3 players it needs to not proceed
 
-Authenticate cards?
 
-Maybe make it so it only sends you a new hand at the start of the next turn if you have an empty hand to not ahve to use a time delay
-Probably make that initial card lock cleaner
-randomizedSelectionArray code could be condensed into one function
 
-Winner declaration and new rounds, maybe add ticks to name plate for wins?
+
+Probably make that initial card lock cleaner, Maybe make it so it only sends you a new hand at the start of the next turn if you have an empty hand to not ahve to use a time delay
+
+
+
 
 Joining in a second tab should redirect rather than just crashing the thing.
 Make error redirects display more informative messages
 Password protect games?
 Space between cards in playerhand and playtable are different
-If a game becomes fewer than 3 players it needs to not proceed
 Isn't responsive on mozilla for some reason
 
+randomizedSelectionArray code could be condensed into one function
+Winner declaration and new rounds, maybe add ticks to name plate for wins?
 
 Later priorities:
+Authenticate cards?
 Make employer friendly version
 Add database and like card learderboard

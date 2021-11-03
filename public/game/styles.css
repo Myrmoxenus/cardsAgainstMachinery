@@ -19,15 +19,9 @@ button{
     color: #303030;
 }
 
-input {
-    background: transparent;
-    width: 80%;
-    height: 100%;
-    display: inline-block;
-    vertical-align: top;
-    font-size: 2vw;
+[contenteditable] {
+  outline: 0px solid transparent;
 }
-
 
 .card{
     line-height: normal;
@@ -167,6 +161,32 @@ input {
     scrollbar-width: none;  /* Firefox */
 }
 
+.namePlateInput{
+    background: transparent;
+    width: 80%;
+    height: 100%;
+    display: inline-block;
+    vertical-align: top;
+    font-size: 2vw;
+}
+
+.redCardEditButton{
+    height: 1.4vw;
+    position: absolute;
+    top: 0.6vw;
+    left:0;
+    right:0;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0.4;
+    animation: fadeIn 0.3s ease;
+}
+
+.redCardEditButton:hover{
+    opacity: 1;
+}
+
+
 #backButton{
     position:fixed;
     z-index: 99999;
@@ -263,6 +283,12 @@ input {
 }
 
 
+@keyframes fadeIn {
+    0% {
+        opacity:0
+    }
+
+  }
 
   @keyframes hexagonRender {
     0% {

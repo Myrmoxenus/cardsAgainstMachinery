@@ -73,16 +73,58 @@ voteToSkipButton.addEventListener('click', voteToSkipButtonClick)
 //Where selected cards are placed prior to being submitted
 let submissionArray = []
 
+
+
 //Function that runs when a card has been selected
 function selectCard(){
     
    let cardType = this.classList[1]
    //Checks if the selected card is a red card, if so, it unselects previously selected redCards.
    if(cardType === 'redCard'){
+
+        function redCardEditButtonFunction(){
+            event.stopPropagation()
+            let redCardEditButton = this
+            let parentCard = this.parentElement
+            parentCard.removeEventListener('click', unselectCard)
+            redCardEditButton.remove()
+            let cardContent = parentCard.firstChild
+            cardContent.contentEditable = true
+            cardContent.focus()
+            cardContent.addEventListener('keyup', function(event){
+                if (event.code === 'Enter') {
+                    //Maybe rerender the card?
+                    cardContent.contentEditable = false
+                    parentCard.appendChild(redCardEditButton)
+                    parentCard.addEventListener('click', unselectCard)
+                  }
+            })
+        }
+
+        if(!this.firstChild.isContentEditable){
+            let redCardEditButton = document.createElement('img')
+            redCardEditButton.src = 'pencil.png'
+            redCardEditButton.className = 'redCardEditButton'
+            redCardEditButton.addEventListener('click', redCardEditButtonFunction)
+            this.appendChild(redCardEditButton)
+        }
+
+
+
        let previouslySelectedRedCard = document.getElementsByClassName('redCardSelected')[0]
        if(previouslySelectedRedCard){
-        //'click's previously selected card to unselect it
-        previouslySelectedRedCard.click()
+           if(previouslySelectedRedCard.firstChild.isContentEditable){
+            previouslySelectedRedCard.firstChild.contentEditable = false
+            previouslySelectedRedCard.addEventListener('click', unselectCard)
+           }
+            
+            //'click's previously selected card to unselect it
+            previouslySelectedRedCard.click()
+            let redCardEditButton = previouslySelectedRedCard.children[1]
+            if(redCardEditButton){
+                previouslySelectedRedCard.removeChild(redCardEditButton)
+            }
+            
        }
    }
    else{
@@ -106,6 +148,10 @@ function selectCard(){
 function unselectCard(){
     let cardType = this.classList[1]
     this.classList.remove(cardType + 'Selected')
+    let redCardEditButton = this.children[1]
+    if(redCardEditButton){
+        redCardEditButton.remove()
+    }
     this.removeEventListener('click', unselectCard)
     this.addEventListener('click', selectCard)
     let cardContent = this.firstChild.innerHTML
@@ -114,6 +160,7 @@ function unselectCard(){
     if(cardType === 'whiteCard'){
         numberWhiteCards()
     }
+
 }
 
 function numberWhiteCards(){
@@ -212,7 +259,6 @@ socket.on('newRedCards', function(newRedCardsArray){
     newRedCardsArray.forEach(card => createCard(playTable, card, 'red'))
     unlockCards(playTable)
     lockCards(playerHand)
-
 });
 
 //Handles the selection of a red card
@@ -328,6 +374,7 @@ socket.on('updatePlayers', function(playerData){
                 
                 let currentNamePlateContent = this.children[0]
                 let temporaryInputBox = document.createElement('input')
+                temporaryInputBox.className = 'namePlateInput'
                 temporaryInputBox.value = currentNamePlateContent.innerHTML
                 temporaryInputBox.addEventListener('keyup', function(event){
                     if (event.code === 'Enter') {
