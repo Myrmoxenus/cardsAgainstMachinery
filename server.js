@@ -203,7 +203,8 @@ io.on('connection', (socket) => {
   socket.on('requestNewHand', function(data){
     console.log('New hand!')
     let currentPlayer = playerMap.get(socket.id)
-    if(currentPlayer && currentPlayer.currentCzar){
+    let currentGame = gameMap.get(currentPlayer.roomName)
+    if(currentPlayer && currentPlayer.currentCzar && !currentGame.redCardCurrentlySubmitted){
       let newRedCardArray = []
       let fullTableOfRedCards = 14
       while(newRedCardArray.length < fullTableOfRedCards) {
@@ -351,9 +352,14 @@ io.on('connection', (socket) => {
             //removes player from array
             connectedPlayers.splice(randomPlayerIndex, 1)
           }
-          io.to(currentGame.roomName).emit('allPlayersSubmitted', randomizedCardSubmissionArray)
-          //Signals to the cardCzar client to create the next and previous arrows for cycling through submitted white card candidates
-          io.to(currentCzar.socketID).emit('makeArrows')
+          if(randomizedCardSubmissionArray.length >= 1){
+            io.to(currentGame.roomName).emit('allPlayersSubmitted', randomizedCardSubmissionArray)
+            //Signals to the cardCzar client to create the next and previous arrows for cycling through submitted white card candidates
+            io.to(currentCzar.socketID).emit('makeArrows')
+          }
+          else{
+            currentGame.advanceTurn()
+          }
       }
     }
     

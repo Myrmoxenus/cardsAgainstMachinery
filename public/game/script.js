@@ -97,6 +97,8 @@ function selectCard(){
                     cardContent.contentEditable = false
                     parentCard.appendChild(redCardEditButton)
                     parentCard.addEventListener('click', unselectCard)
+                    submissionArray = []
+                    submissionArray.push(cardContent.innerHTML)
                   }
             })
         }

@@ -1,5 +1,4 @@
-
-Red Card Editing
+Voting to skip when nobody has submitted cards breaks the game.
 Card storage
 You should not get in a situation where your hand is empty
 conditional button rendering
