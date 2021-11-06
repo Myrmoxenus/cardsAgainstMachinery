@@ -184,7 +184,8 @@ io.on('connection', (socket) => {
         socket.emit('assignRoundPlayerString', currentPlayer.roundPlayerString)
         let connectedPlayers = currentGame.players.filter(player => player.connected)
         //Once the game has at least 3 players, assign the first player to Card Czar
-        if(connectedPlayers.length >= 3){
+        //Did this fix it?
+        if(connectedPlayers.length === 3){
           connectedPlayers[0].setPlayerToCzar()
                 
           io.to(currentGame.roomName).emit('updatePlayers', currentGame.players)

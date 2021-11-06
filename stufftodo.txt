@@ -1,3 +1,9 @@
+Can't draw cards on first turn
+You should probably be able to see which player you aer
+Submit card should disappear from player buttons
+Seeing previous cards to make a selection
+
+
 Voting to skip when nobody has submitted cards breaks the game.
 Card storage
 You should not get in a situation where your hand is empty
