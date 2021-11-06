@@ -26,18 +26,30 @@ setTimeout(function() {
 //An array that holds the all of the submitted white card candidates. This array is used to cycle through cards while cardCzar is selecting a winner
 let submittedWhiteCardCandidates = []
 
-//Buttons from DOM assigned to variables
+//
+let playerButtonContainer = document.getElementById('playerButtonContainer')
+let czarButtonContainer = document.getElementById('czarButtonContainer')
 
-let drawHandButton = document.getElementById('drawHandButton');
-let submitCardButton = document.getElementById('submitCardButton');
-let selectWinnerButton = document.getElementById('selectWinnerButton')
-let voteToSkipButton = document.getElementById('voteToSkipButton')
-//Button functions 
+//Button functions
+ //Function for selectWinnerButton
+function selectWinnerButtonClick(){
+    currentCzar = false
+    removeButtons()
+    let winnerCards = submittedWhiteCardCandidates[0]
+    socket.emit('winnerSelected', winnerCards)
+}
 
+//Function for voteToSkipButton
+function voteToSkipButtonClick(){
+    socket.emit('votedToSkip')
+}
+
+//Function for drawHandButton
 function drawHandButtonClick(){
     socket.emit('requestNewHand');
 }
 
+//function for submitCardButton
 function submitCardButtonClick(){
     if(submissionArray){
         //If white cards are selected, removes them from player's hand on submission
@@ -49,30 +61,45 @@ function submitCardButtonClick(){
         }
         socket.emit('cardSubmission', submissionArray);
     }
-//Clears submission array
-submissionArray = []
+    //Clears submission array
+    submissionArray = []
 }
 
-//Function for submitting the content of a selected card
-function selectWinnerButtonClick(){
-    let winnerCards = submittedWhiteCardCandidates[0]
-    socket.emit('winnerSelected', winnerCards)
+
+
+
+function createButton(button, target){
+    let createdButton = document.createElement('button')
+    let buttonID = button.toString() + 'Button'
+    createdButton.id = buttonID
+    let buttonTextArray = button.split(/(?=[A-Z])/)
+    let buttonTextString = ''
+    buttonTextArray.forEach(word => {
+        buttonTextString += word.charAt(0).toUpperCase() + word.slice(1) + ' '
+    })
+    createdButton.innerHTML = buttonTextString
+ 
+    let buttonFunctionString = buttonID + 'Click'
+    let buttonFunction = window[buttonFunctionString]
+    createdButton.addEventListener('click', buttonFunction)
+    target.appendChild(createdButton)
 }
 
-//Function for voting to skip
-function voteToSkipButtonClick(){
-    socket.emit('votedToSkip')
+function removeButtons(){
+
+    while(playerButtonContainer.firstChild){
+        playerButtonContainer.removeChild(playerButtonContainer.firstChild);
+    }
+    while(czarButtonContainer.firstChild){
+        czarButtonContainer.removeChild(czarButtonContainer.firstChild);
+    }
 }
 
-//Adds event listeners to 
-drawHandButton.addEventListener('click', drawHandButtonClick);
-submitCardButton.addEventListener('click', submitCardButtonClick)
-selectWinnerButton.addEventListener('click', selectWinnerButtonClick)
-voteToSkipButton.addEventListener('click', voteToSkipButtonClick)
 
 //Where selected cards are placed prior to being submitted
 let submissionArray = []
-
+//Variable that stores if player is currently czar
+let currentCzar = false
 
 
 //Function that runs when a card has been selected
@@ -105,7 +132,7 @@ function selectCard(){
 
         if(!this.firstChild.isContentEditable){
             let redCardEditButton = document.createElement('img')
-            redCardEditButton.src = 'pencil.png'
+            redCardEditButton.src = 'images/pencil.png'
             redCardEditButton.className = 'redCardEditButton'
             redCardEditButton.addEventListener('click', redCardEditButtonFunction)
             this.appendChild(redCardEditButton)
@@ -245,6 +272,7 @@ socket.on('assignRoundPlayerString', function(roundPlayerString){
 
 //Replaces player hand with cards from server
 socket.on('newPlayerHand', function(newHandArray){
+    submissionArray = []
     
     //clears existing playerHand
     clearSection(playerHand)
@@ -256,24 +284,35 @@ socket.on('newPlayerHand', function(newHandArray){
 
 //Produces red card candidates from cards from server
 socket.on('newRedCards', function(newRedCardsArray){
-    
+    submissionArray = []
+    currentCzar = true
     clearSection(playTable)
+    removeButtons()
     newRedCardsArray.forEach(card => createCard(playTable, card, 'red'))
     unlockCards(playTable)
     lockCards(playerHand)
+    createButton('drawHand', czarButtonContainer)
+    createButton('submitCard', czarButtonContainer)
 });
 
 //Handles the selection of a red card
 socket.on('redCardSelection', function(redCardContent){
 
+removeButtons()
 clearSection(playTable)
 createCard(playTable,redCardContent,'red')
 lockCards(playTable)
+console.log(submissionArray)
 //If the player was not the Czar and therefore does not have a red card currently sitting in their submission array, it unlocks their hand to allow them to submit cards
-if(redCardContent !== submissionArray[0]){
-    unlockCards(playerHand)
-}
-
+    if(!currentCzar){
+        unlockCards(playerHand)
+        createButton('drawHand', playerButtonContainer)
+        createButton('submitCard', playerButtonContainer)
+        createButton('voteToSkip', playerButtonContainer)
+    }
+    else{
+        createButton('voteToSkip', czarButtonContainer)
+    }
 })
 
 //Locks player hand when signaled from the server 
@@ -297,12 +336,14 @@ socket.on('replacementWhiteCards', function(replacementCards){
 
 //Sets the submittedWhiteCardCandidates array to the array randomized and sent from the server
 socket.on('allPlayersSubmitted', function(cardArray){
+    removeButtons()
     submittedWhiteCardCandidates = cardArray
 })
 
 //Creates arrows that allows the cardCzar to cycle all players through white card submissions
 socket.on('makeArrows', function(){
-
+    createButton('selectWinner', czarButtonContainer)
+    createButton('voteToSkip', czarButtonContainer)
     function nextSubmission(){
         socket.emit('nextArrow')
     }
@@ -312,16 +353,18 @@ socket.on('makeArrows', function(){
     }
     
     let backButton = document.createElement('img')
-    backButton.src = 'backButton.png'
+    backButton.src = 'images/backButton.png'
     backButton.id = 'backButton'
     backButton.addEventListener('click', previousSubmission)
-    buttonContainer.appendChild(backButton)
+    //This is whack, fix this
+    playerButtonContainer.appendChild(backButton)
 
     let nextButton = document.createElement('img')
-    nextButton.src = 'nextButton.png'
+    nextButton.src = 'images/nextButton.png'
     nextButton.id = 'nextButton'
     nextButton.addEventListener('click', nextSubmission)
-    buttonContainer.appendChild(nextButton)
+    //This is whack, fix this
+    playerButtonContainer.appendChild(nextButton)
 
 })
 
@@ -349,10 +392,11 @@ socket.on('previousArrow', function(){
 socket.on('clearTable', function(){
     lockCards(playerHand)
     clearSection(playTable)
+    /*
     let nextButton  = document.getElementById('nextButton')
     let backButton  = document.getElementById('backButton')
     nextButton.remove()
-    backButton.remove()
+    backButton.remove()*/
 })
 
 //Updates player nameplates on new player joins, score changes, and player name changes

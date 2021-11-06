@@ -203,14 +203,16 @@ io.on('connection', (socket) => {
   socket.on('requestNewHand', function(data){
     console.log('New hand!')
     let currentPlayer = playerMap.get(socket.id)
-    let currentGame = gameMap.get(currentPlayer.roomName)
-    if(currentPlayer && currentPlayer.currentCzar && !currentGame.redCardCurrentlySubmitted){
-      let newRedCardArray = []
-      let fullTableOfRedCards = 14
-      while(newRedCardArray.length < fullTableOfRedCards) {
-        newRedCardArray.push(redCardArray[randomUpTo(redCardArray.length-1)])
+    if(currentPlayer && currentPlayer.currentCzar){
+      let currentGame = gameMap.get(currentPlayer.roomName)
+      if(currentGame && !currentGame.redCardCurrentlySubmitted){
+        let newRedCardArray = []
+        let fullTableOfRedCards = 14
+        while(newRedCardArray.length < fullTableOfRedCards) {
+          newRedCardArray.push(redCardArray[randomUpTo(redCardArray.length-1)])
+        }
+        socket.emit('newRedCards', newRedCardArray) 
       }
-      socket.emit('newRedCards', newRedCardArray) 
     }
     else if(currentPlayer && !currentPlayer.drewCardsThisTurn){
       currentPlayer.drewCardsThisTurn = true
