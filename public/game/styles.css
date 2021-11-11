@@ -205,6 +205,14 @@ input{
     opacity: 1;
 }
 
+.playerIndicator{
+    height: 1.4vw;
+    margin-top: 3.2vw;
+    left: 0.8vw;
+    position: absolute;
+    opacity: 0.4;
+}
+
 .buttonContainer{
     
     margin-left: 25vw;

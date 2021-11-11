@@ -17,7 +17,7 @@ let onLoadData = {
     roundPlayerString: window.localStorage.getItem('roundPlayerString')
 }
 socket.emit('gamePageLoad', onLoadData)
-socket.emit('requestNewHand')
+
 //Locks cards on a delay while it waits for the server to emit a hand to each player. I'm not in love with this.
 setTimeout(function() {
     lockCards(playerHand)
@@ -41,16 +41,35 @@ function selectWinnerButtonClick(){
 
 //Function for voteToSkipButton
 function voteToSkipButtonClick(){
+    this.remove()
+    
+    if(submissionArray){
+        //If white cards are selected, removes them from player's hand on submission
+        let selectedCards = document.getElementsByClassName('whiteCardSelected')
+        if(selectedCards.length !== 0){
+            while(selectedCards[0]){
+                selectedCards[0].remove()
+            }
+        }
+        socket.emit('cardSubmission', submissionArray);
+    }
+    //Clears submission array
+    submissionArray = []
+
     socket.emit('votedToSkip')
 }
 
 //Function for drawHandButton
 function drawHandButtonClick(){
+    if(!currentCzar){
+        this.remove()
+    }
     socket.emit('requestNewHand');
 }
 
 //function for submitCardButton
 function submitCardButtonClick(){
+    this.remove()
     if(submissionArray){
         //If white cards are selected, removes them from player's hand on submission
         let selectedCards = document.getElementsByClassName('whiteCardSelected')
@@ -337,13 +356,15 @@ socket.on('replacementWhiteCards', function(replacementCards){
 //Sets the submittedWhiteCardCandidates array to the array randomized and sent from the server
 socket.on('allPlayersSubmitted', function(cardArray){
     removeButtons()
+    
     submittedWhiteCardCandidates = cardArray
+    createButton('voteToSkip', playerButtonContainer)
 })
 
 //Creates arrows that allows the cardCzar to cycle all players through white card submissions
 socket.on('makeArrows', function(){
     createButton('selectWinner', czarButtonContainer)
-    createButton('voteToSkip', czarButtonContainer)
+    //createButton('voteToSkip', czarButtonContainer)
     function nextSubmission(){
         socket.emit('nextArrow')
     }
@@ -401,6 +422,7 @@ socket.on('clearTable', function(){
 
 //Updates player nameplates on new player joins, score changes, and player name changes
 socket.on('updatePlayers', function(playerData){
+    
     //Removes current name plates, skipping the invisible one used for formatting
     clearSection(informationPanel)
 
@@ -433,6 +455,17 @@ socket.on('updatePlayers', function(playerData){
             }
 
             currentPlayerNamePlate.addEventListener('dblclick', namePlateDoubleClick)
+            
+            //Creates a dot that indicates which player the client is
+            let playerIndicator= document.createElement('img')
+            playerIndicator.src = 'images/playerIndicator.png'
+            playerIndicator.className = 'playerIndicator'
+            currentPlayerNamePlate.appendChild(playerIndicator)
+
+            //Jank ass.
+            if(!currentCzar && playerButtonContainer.children.length === 0 && connectedPlayers.length > 2){
+                createButton('voteToSkip', playerButtonContainer)
+            }
         }
 
         if(player.currentCzar){
@@ -441,6 +474,7 @@ socket.on('updatePlayers', function(playerData){
             currentPlayerNamePlate.children[1].id = 'cardCzarScoreContainer'
             currentPlayerNamePlate.children[1].firstChild.id  = 'cardCzarScoreContent'
         }
+
         })
     
 })

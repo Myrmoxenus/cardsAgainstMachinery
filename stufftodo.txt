@@ -1,8 +1,11 @@
-Can't draw cards on first turn
-You should probably be able to see which player you aer
-Submit card should disappear from player buttons
-Seeing previous cards to make a selection
 
+Multiple refreshes empties the hand
+
+Seeing previous cards to make a selectionVote to skip during card selection
+Vote to skip removes a card
+Maybe remove card draw limits between turns?
+Name plate font sizes
+roomname to capitals
 
 Voting to skip when nobody has submitted cards breaks the game.
 Card storage

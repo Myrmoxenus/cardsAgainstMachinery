@@ -183,6 +183,18 @@ io.on('connection', (socket) => {
         currentGame.players.push(currentPlayer)
         socket.emit('assignRoundPlayerString', currentPlayer.roundPlayerString)
         let connectedPlayers = currentGame.players.filter(player => player.connected)
+        
+        //Sends new player their first hand
+        let newHandArray = []
+        let maxHandSize = 14
+        while(newHandArray.length < maxHandSize) {
+          newHandArray.push(whiteCardArray[randomUpTo(whiteCardArray.length-1)])
+        }
+        socket.emit('newPlayerHand', newHandArray)
+        if(currentPlayer && (currentPlayer.submittedCardsThisTurn || currentPlayer.currentCzar)){
+          socket.emit('lockPlayerHand')
+        }
+
         //Once the game has at least 3 players, assign the first player to Card Czar
         //Did this fix it?
         if(connectedPlayers.length === 3){
@@ -341,19 +353,20 @@ io.on('connection', (socket) => {
       }
       else{
         let currentCzar = currentGame.players.find(player => player.currentCzar)
+        let submittedPlayers = connectedPlayers.filter(player => player.submittedCardsThisTurn)
         let randomizedCardSubmissionArray = []
-          while(randomizedCardSubmissionArray.length < connectedPlayers.length){
+          while(randomizedCardSubmissionArray.length < submittedPlayers.length){
             //Randomly selects a connected players cards and pushes it to radomizedCardSubmissionArray
-            let randomPlayerIndex = randomUpTo(connectedPlayers.length - 1)
+            let randomPlayerIndex = randomUpTo(submittedPlayers.length - 1)
             console.log('randomPlayerIndex: ' + randomPlayerIndex)
-            let randomPlayer = connectedPlayers[randomPlayerIndex]
+            let randomPlayer = submittedPlayers[randomPlayerIndex]
             console.log(randomPlayer)
             let randomCards = randomPlayer.submittedCards
             if(randomCards[0]){
               randomizedCardSubmissionArray.push(randomCards)
             }
             //removes player from array
-            connectedPlayers.splice(randomPlayerIndex, 1)
+            submittedPlayers.splice(randomPlayerIndex, 1)
           }
           if(randomizedCardSubmissionArray.length >= 1){
             io.to(currentGame.roomName).emit('allPlayersSubmitted', randomizedCardSubmissionArray)
