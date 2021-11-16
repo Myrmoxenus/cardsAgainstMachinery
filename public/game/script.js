@@ -6,7 +6,7 @@ let playerHand = document.getElementById('playerHand');
 let playTable = document.getElementById('playTable');
 let informationPanel = document.getElementById('informationPanel');
 let buttonContainer = document.getElementById('buttonContainer')
-
+let dropDownContainer = document.getElementById('dropDownContainer')
 
 //Grabs roomname from user's address
 let roomName =  window.location.toString().split('/')
@@ -33,11 +33,52 @@ let czarButtonContainer = document.getElementById('czarButtonContainer')
 //Button functions
  //Function for selectWinnerButton
 function selectWinnerButtonClick(){
+    this.remove()
+
+   playTable.hidden = true
+   playerButtonContainer.hidden = true
+   playerHand.style.opacity = 0
+   czarButtonContainer.hidden = true
+
+
+    let candidateDropDown = document.createElement('div')
+    submittedWhiteCardCandidates.forEach(candidate =>{
+        let candidateCardContainer = document.createElement('div')
+        candidateCardContainer.className = 'candidateCardContainer'
+        candidate.forEach(candidateCardContent => {
+            createCard(candidateCardContainer, candidateCardContent)
+        })
+        createButton( 'selectCandidate', candidateCardContainer)
+        candidateDropDown.appendChild(candidateCardContainer)
+    })
+
+    dropDownContainer.appendChild(candidateDropDown)
+
+}
+
+function selectCandidateButtonClick(){
     currentCzar = false
+    playTable.hidden = false
+    playerButtonContainer.hidden = false
+    playerHand.style.opacity = 1
+    czarButtonContainer.hidden = false
+    
+    while(dropDownContainer.children[0]){
+        dropDownContainer.children[0].remove()
+    }
+
     removeButtons()
-    let winnerCards = submittedWhiteCardCandidates[0]
+    
+    let winnerCardContainer = this.parentElement
+    let winnerCards = []
+    for(let i = 0; i<winnerCardContainer.children.length-1; i++){
+        winnerCards.push(winnerCardContainer.children[i].children[0].innerHTML)
+    }
+  
     socket.emit('winnerSelected', winnerCards)
 }
+
+
 
 //Function for voteToSkipButton
 function voteToSkipButtonClick(){
@@ -413,11 +454,6 @@ socket.on('previousArrow', function(){
 socket.on('clearTable', function(){
     lockCards(playerHand)
     clearSection(playTable)
-    /*
-    let nextButton  = document.getElementById('nextButton')
-    let backButton  = document.getElementById('backButton')
-    nextButton.remove()
-    backButton.remove()*/
 })
 
 //Updates player nameplates on new player joins, score changes, and player name changes

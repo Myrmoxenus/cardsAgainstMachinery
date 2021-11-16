@@ -220,6 +220,27 @@ input{
     user-select: none;
 }
 
+.candidateCardContainer{
+
+    height: 10.5vw
+}
+
+#dropDownContainer{
+    overflow-y: auto;
+    overflow-x: auto;
+    margin-left: 22vw; 
+    margin-right: 10vw
+}
+
+.candidateCardContainer button{
+    color: transparent;
+}
+
+.candidateCardContainer:hover button{
+    animation: fadeIn 0.3s ease;
+    color:#F7D04D
+}
+
 #playerButtonContainer{
     margin-top: 28vw;
 }
