@@ -57,7 +57,7 @@ function selectWinnerButtonClick(){
 }
 
 function selectCandidateButtonClick(){
-    currentCzar = false
+    //currentCzar = false
     playTable.hidden = false
     playerButtonContainer.hidden = false
     playerHand.style.opacity = 1
@@ -115,7 +115,15 @@ function submitCardButtonClick(){
         //If white cards are selected, removes them from player's hand on submission
         let selectedCards = document.getElementsByClassName('whiteCardSelected')
         if(selectedCards.length !== 0){
+            let storedCardArray = JSON.parse(window.localStorage.getItem('storedCards')) || []
             while(selectedCards[0]){
+                let currentCardContent = selectedCards[0].firstChild.innerHTML
+                if(storedCardArray.includes(currentCardContent)){
+                    let storedCardIndex = storedCardArray.indexOf(currentCardContent)
+                    storedCardArray.splice(storedCardIndex, 1)
+                    let storedCardString = JSON.stringify(storedCardArray)
+                    window.localStorage.setItem('storedCards', storedCardString)
+                }
                 selectedCards[0].remove()
             }
         }
@@ -217,6 +225,7 @@ function selectCard(){
        }
    }
    else{
+
        numberWhiteCards()
        //
        let submissionOrderNumber= document.createElement('div')
@@ -224,6 +233,8 @@ function selectCard(){
        submissionOrderNumberValue = submissionArray.length + 1
        submissionOrderNumber.innerText = submissionOrderNumberValue
        this.appendChild(submissionOrderNumber)
+
+
    }
    this.classList.add(cardType + 'Selected')
    this.removeEventListener('click', selectCard)
@@ -305,6 +316,74 @@ function lockCards(section){
     }
 }
 
+function storeCard(){
+    event.stopPropagation()
+
+    let storeCardButton = this
+    let parentCard = this.parentElement
+    let cardContent = parentCard.firstChild.innerHTML
+    let storedCardArray = JSON.parse(window.localStorage.getItem('storedCards')) || []
+    if(!storedCardArray.includes(cardContent)){
+        storedCardArray.push(cardContent)
+        storedCardString = JSON.stringify(storedCardArray)
+        window.localStorage.setItem('storedCards', storedCardString)
+        parentCard.className += ' storedCard'
+    
+        storeCardButton.remove()
+
+        let unstoreCardButton = document.createElement('img')
+        unstoreCardButton.src = 'images/unstore.png'
+        unstoreCardButton.className = 'storeCardButton'
+        unstoreCardButton.addEventListener('click', unstoreCard)
+        parentCard.appendChild(unstoreCardButton)
+    }
+}
+
+function unstoreCard(){
+    event.stopPropagation()
+    let unstoreCardButton = this
+    let parentCard = this.parentElement
+    let cardContent = parentCard.firstChild.innerHTML
+    let storedCardArray = JSON.parse(window.localStorage.getItem('storedCards'))
+    let storedCardIndex = storedCardArray.indexOf(cardContent)
+    if(storedCardArray.includes(cardContent)){
+        storedCardArray.splice(storedCardIndex, 1)
+        let storedCardString = JSON.stringify(storedCardArray)
+        window.localStorage.setItem('storedCards', storedCardString)
+    }
+    parentCard.classList.remove('storedCard')
+    unstoreCardButton.remove('storedCard')
+    let storeCardButton = document.createElement('img')
+    storeCardButton.src = 'images/store.png'
+    storeCardButton.className = 'storeCardButton'
+    storeCardButton.addEventListener('click', storeCard)
+    parentCard.appendChild(storeCardButton)
+}
+
+function createCardStorageButtons(){
+    for(let i = 1; i<playerHand.children.length; i++){
+        let currentCard = playerHand.children[i]
+        let currentCardClassesString = currentCard.className
+        let currentCardClassesArray = currentCardClassesString.split(' ')
+        if(currentCard.children.length < 2){
+            if(currentCardClassesArray.includes('storedCard')){
+                let unstoreCardButton = document.createElement('img')
+                unstoreCardButton.src = 'images/unstore.png'
+                unstoreCardButton.className = 'storeCardButton'
+                unstoreCardButton.addEventListener('click', unstoreCard)
+                currentCard.appendChild(unstoreCardButton)
+            }
+            else{
+                let storeCardButton = document.createElement('img')
+                storeCardButton.src = 'images/store.png'
+                storeCardButton.className = 'storeCardButton'
+                storeCardButton.addEventListener('click', storeCard)
+                currentCard.appendChild(storeCardButton)
+            }
+
+        }
+    }
+}
 
 
 // Socket behavior
@@ -333,19 +412,30 @@ socket.on('assignRoundPlayerString', function(roundPlayerString){
 //Replaces player hand with cards from server
 socket.on('newPlayerHand', function(newHandArray){
     submissionArray = []
+
     
+    let storedCardArray = JSON.parse(window.localStorage.getItem('storedCards')) || []
     //clears existing playerHand
     clearSection(playerHand)
-    newHandArray.forEach(card => createCard(playerHand, card))
+    storedCardArray.forEach(card => createCard(playerHand, card))
+    for(let i=1; i<playerHand.children.length; i++){
+        let currentCard = playerHand.children[i]
+        currentCard.className += ' storedCard'
+    }
+    while(playerHand.children.length<15){
+        let newCardContent = newHandArray.pop()
+        createCard(playerHand, newCardContent)
+    }
     //Adds the card select event listeners
     unlockCards(playerHand)
+    createCardStorageButtons()
 
 });
 
 //Produces red card candidates from cards from server
 socket.on('newRedCards', function(newRedCardsArray){
     submissionArray = []
-    currentCzar = true
+    //currentCzar = true
     clearSection(playTable)
     removeButtons()
     newRedCardsArray.forEach(card => createCard(playTable, card, 'red'))
@@ -392,6 +482,7 @@ socket.on('playerSubmittedCards', function(numberOfCards){
 //Replenishes submitted white cards into a players hand
 socket.on('replacementWhiteCards', function(replacementCards){
     replacementCards.forEach(card => createCard(playerHand, card))
+    createCardStorageButtons()
 })
 
 //Sets the submittedWhiteCardCandidates array to the array randomized and sent from the server
@@ -472,7 +563,6 @@ socket.on('updatePlayers', function(playerData){
         let currentPlayerNamePlate = informationPanel.children[informationPanel.children.length-1]
         //When rendering the nameplate of the current player as determined by the socketID property on the incoming player object it adds an event listener for allowing the player to change their name
         if(player.socketID === socket.id){
-
             //Function for current player nameplate that allows you to change your name
             function namePlateDoubleClick(){
                 
@@ -497,8 +587,17 @@ socket.on('updatePlayers', function(playerData){
             playerIndicator.src = 'images/playerIndicator.png'
             playerIndicator.className = 'playerIndicator'
             currentPlayerNamePlate.appendChild(playerIndicator)
-
+            
             //Jank ass.
+            if(player.currentCzar){
+                currentCzar=true
+            }
+            else{
+                currentCzar=false
+                removeButtons()
+            }
+
+            //Also jank ass.
             if(!currentCzar && playerButtonContainer.children.length === 0 && connectedPlayers.length > 2){
                 createButton('voteToSkip', playerButtonContainer)
             }

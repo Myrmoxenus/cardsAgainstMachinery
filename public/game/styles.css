@@ -91,6 +91,15 @@ input{
     background-color: #CCB9A1;
 }
 
+.whiteCard img{
+    opacity: 0;
+}
+
+.whiteCard:hover img{
+    opacity: 0.4;
+    animation: fadeIn 0.3s ease;
+}
+
 .whiteCardSelected{
     background-color: #CCB9A1;
 }
@@ -101,7 +110,7 @@ input{
     position: absolute;
     left:0;
     right:0;
-  
+    margin-top: 7.4vw;
     margin-left: auto;
     margin-right: auto;
     font-size: 1.8vw;
@@ -128,6 +137,19 @@ input{
 
 .redCardLocked{
     background-color: #CB823D;
+}
+
+.storedCard{
+    background-color: #BECFFF;
+}
+.storedCard.whiteCardSelected{
+    background-color: #586587;
+}
+.storedCard.whiteCardLocked{
+    background-color: #586587;
+}
+.storedCard:hover{
+    background-color: #586587;
 }
 
 .namePlate{
@@ -204,6 +226,21 @@ input{
 .redCardEditButton:hover{
     opacity: 1;
 }
+
+.storeCardButton{
+    height: 1.4vw;
+    position: absolute;
+    top: 0.6vw;
+    left:0;
+    right:0;
+    margin-left: auto;
+    margin-right: auto;
+}
+.storeCardButton:hover{
+    opacity: 1 !important;
+}
+
+
 
 .playerIndicator{
     height: 1.4vw;
