@@ -143,13 +143,13 @@ input{
     background-color: #BECFFF;
 }
 .storedCard.whiteCardSelected{
-    background-color: #586587;
+    background-color: #4E62A0;
 }
 .storedCard.whiteCardLocked{
-    background-color: #586587;
+    background-color: #4E62A0;
 }
 .storedCard:hover{
-    background-color: #586587;
+    background-color: #4E62A0;
 }
 
 .namePlate{
