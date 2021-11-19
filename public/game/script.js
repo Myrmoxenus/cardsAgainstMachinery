@@ -599,6 +599,9 @@ socket.on('updatePlayers', function(playerData){
 
             //Also jank ass.
             if(!currentCzar && playerButtonContainer.children.length === 0 && connectedPlayers.length > 2){
+                if(!player.submittedCardsThisTurn){
+                createButton('submitCard', playerButtonContainer)
+                }
                 createButton('voteToSkip', playerButtonContainer)
             }
         }

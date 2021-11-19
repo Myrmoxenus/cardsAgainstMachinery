@@ -74,7 +74,21 @@ class player {
           }
     io.to(this.socketID).emit('newRedCards', newRedCardArray)
   }
+
+  emitHandToPlayer(){
+  //Sends new player their first hand
+  let newHandArray = []
+  let maxHandSize = 14
+  while(newHandArray.length < maxHandSize) {
+    newHandArray.push(whiteCardArray[randomUpTo(whiteCardArray.length-1)])
+    }
+    io.to(this.socketID).emit('newPlayerHand', newHandArray)
+  if(this.submittedCardsThisTurn || this.currentCzar){
+    io.to(this.socketID).emit('lockPlayerHand')
+    }
+  }
 }
+
 
 //Map for storing player objects
 let playerMap = new Map()
@@ -168,6 +182,13 @@ io.on('connection', (socket) => {
         playerMap.set(socket.id, currentPlayer)
         currentPlayer.socketID = socket.id
         currentPlayer.connected = true
+        let connectedPlayers = currentGame.players.filter(player => player.connected)
+        if(connectedPlayers.length < 3){
+          currentPlayer.emitHandToPlayer()
+        }
+        if(currentGame.redCardCurrentlySubmitted){
+          currentPlayer.submittedCardsThisTurn = true
+        }
       }
       //If player is currently connected it redirects them 
       else if(currentPlayer && currentPlayer.connected){
@@ -185,16 +206,8 @@ io.on('connection', (socket) => {
         let connectedPlayers = currentGame.players.filter(player => player.connected)
         
         //Sends new player their first hand
-        let newHandArray = []
-        let maxHandSize = 14
-        while(newHandArray.length < maxHandSize) {
-          newHandArray.push(whiteCardArray[randomUpTo(whiteCardArray.length-1)])
-        }
-        socket.emit('newPlayerHand', newHandArray)
-        if(currentPlayer && (currentPlayer.submittedCardsThisTurn || currentPlayer.currentCzar)){
-          socket.emit('lockPlayerHand')
-        }
-
+        currentPlayer.emitHandToPlayer()
+        
         //Once the game has at least 3 players, assign the first player to Card Czar
         //Did this fix it?
         if(connectedPlayers.length === 3){
@@ -229,15 +242,7 @@ io.on('connection', (socket) => {
     }
     else if(currentPlayer && !currentPlayer.drewCardsThisTurn){
       currentPlayer.drewCardsThisTurn = true
-      let newHandArray = []
-      let maxHandSize = 14
-      while(newHandArray.length < maxHandSize) {
-        newHandArray.push(whiteCardArray[randomUpTo(whiteCardArray.length-1)])
-      }
-      socket.emit('newPlayerHand', newHandArray)
-      if(currentPlayer && (currentPlayer.submittedCardsThisTurn || currentPlayer.currentCzar)){
-        socket.emit('lockPlayerHand')
-      }
+      currentPlayer.emitHandToPlayer()
     }
 
   })
