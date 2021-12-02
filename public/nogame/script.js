@@ -14,5 +14,5 @@ function testButtonClick(){
 }
 
 socket.on('gameCreated', function(){
-    window.location.replace(window.location.origin + '/game/' + roomName.toUpperCase())
+    window.location.replace(window.location.origin + '/game/' + roomName)
 })

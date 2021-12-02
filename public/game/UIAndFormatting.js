@@ -124,10 +124,10 @@ function createNamePlate(name, score){
     //Adjusts font size based on text length, using magic numbers
     if(name.length > 40){
         let extraTextLength = name.length - 40
-        let magicSlope = 1.62/name.length
+        let magicSlope = 1.3/name.length
         namePlateFontSize = 1.8 - extraTextLength*magicSlope
-        if (namePlateFontSize < 0.2){
-            namePlateFontSize = 0.2
+        if (namePlateFontSize < 0.5){
+            namePlateFontSize = 0.5
         }
     }
     //If name length is especially long, makes nameplate scrollable

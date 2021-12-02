@@ -101,6 +101,7 @@ class game {
     this.players = []
     this.winningScore = 10
     this.redCardCurrentlySubmitted = false
+    this.currentRedCardContent = ''
     this.timeOfLastTurn = new Date()
   }
   //Advances the game turn
@@ -183,12 +184,15 @@ io.on('connection', (socket) => {
         currentPlayer.socketID = socket.id
         currentPlayer.connected = true
         let connectedPlayers = currentGame.players.filter(player => player.connected)
-        if(connectedPlayers.length < 3){
-          currentPlayer.emitHandToPlayer()
-        }
+        socket.emit('loadLastHand')
         if(currentGame.redCardCurrentlySubmitted){
           currentPlayer.submittedCardsThisTurn = true
         }
+        if(connectedPlayers.length === 3){
+          connectedPlayers[0].setPlayerToCzar()
+                
+          io.to(currentGame.roomName).emit('updatePlayers', currentGame.players)
+            }
       }
       //If player is currently connected it redirects them 
       else if(currentPlayer && currentPlayer.connected){
@@ -209,7 +213,6 @@ io.on('connection', (socket) => {
         currentPlayer.emitHandToPlayer()
         
         //Once the game has at least 3 players, assign the first player to Card Czar
-        //Did this fix it?
         if(connectedPlayers.length === 3){
           connectedPlayers[0].setPlayerToCzar()
                 
@@ -393,13 +396,22 @@ io.on('connection', (socket) => {
       let currentGame = gameMap.get(currentPlayer.roomName)
       currentPlayer.connected = false
 
-       //If only one player remains in the room, set them to Card Czar
+       //If fewer than 3 players remain. Reset players to waiting for game status
        let connectedPlayers = currentGame.players.filter(player => player.connected)
-       if(connectedPlayers.length === 1){
-        connectedPlayers[0].setPlayerToCzar()
+       if(connectedPlayers.length < 3){
+        currentGame.players.forEach(player => {
+          player.hadTurn = false
+          player.currentCzar = false
+          player.submittedCardsThisTurn = false
+          player.submittedCards = []
+          player.drewCardsThisTurn = false
+          player.votedToSkip = false
+        })
+        io.to(currentGame.roomName).emit('clearTable', currentGame.players)
       }
 
       io.to(currentGame.roomName).emit('updatePlayers', currentGame.players)
+      
 
       if(currentPlayer.currentCzar){  
         currentPlayer.currentCzar = false

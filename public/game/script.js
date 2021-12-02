@@ -30,6 +30,7 @@ let submittedWhiteCardCandidates = []
 let playerButtonContainer = document.getElementById('playerButtonContainer')
 let czarButtonContainer = document.getElementById('czarButtonContainer')
 
+
 //Button functions
  //Function for selectWinnerButton
 function selectWinnerButtonClick(){
@@ -134,7 +135,38 @@ function submitCardButtonClick(){
 }
 
 
+function storeCurrentHand(){
+    let arrayOfCards = []
+    for(let i = 1; i < 15; i++){
+        let currentCard = playerHand.children[i]
+        let currentCardContent = currentCard.firstChild.innerHTML
+        arrayOfCards.push(currentCardContent)
+    }
+    let arrayOfCardsString = JSON.stringify(arrayOfCards.reverse())
+    window.localStorage.setItem('lastHand', arrayOfCardsString)
+}
 
+function grabLastHandFromStorage(){
+    let storedCardArray = JSON.parse(window.localStorage.getItem('storedCards')) || []
+    let lastHandArray = JSON.parse(window.localStorage.getItem('lastHand')) || []
+    
+    //clears existing playerHand
+    clearSection(playerHand)
+    storedCardArray.forEach(card => createCard(playerHand, card))
+    for(let i=1; i<playerHand.children.length; i++){
+        let currentCard = playerHand.children[i]
+        let currentCardContent = currentCard.firstChild.innerHTML
+        let currentCardIndex = lastHandArray.indexOf(currentCardContent)
+        lastHandArray.splice(currentCardIndex, 1)
+        currentCard.className += ' storedCard'
+    }
+    while(playerHand.children.length<15){
+        let retrievedCardContent = lastHandArray.pop()
+        createCard(playerHand, retrievedCardContent)
+    }
+
+    createCardStorageButtons()
+}
 
 function createButton(button, target){
     let createdButton = document.createElement('button')
@@ -358,6 +390,7 @@ function unstoreCard(){
     storeCardButton.className = 'storeCardButton'
     storeCardButton.addEventListener('click', storeCard)
     parentCard.appendChild(storeCardButton)
+    storeCurrentHand()
 }
 
 function createCardStorageButtons(){
@@ -412,7 +445,6 @@ socket.on('assignRoundPlayerString', function(roundPlayerString){
 //Replaces player hand with cards from server
 socket.on('newPlayerHand', function(newHandArray){
     submissionArray = []
-
     
     let storedCardArray = JSON.parse(window.localStorage.getItem('storedCards')) || []
     //clears existing playerHand
@@ -428,8 +460,9 @@ socket.on('newPlayerHand', function(newHandArray){
     }
     //Adds the card select event listeners
     unlockCards(playerHand)
+    storeCurrentHand()
     createCardStorageButtons()
-
+    
 });
 
 //Produces red card candidates from cards from server
@@ -547,6 +580,10 @@ socket.on('clearTable', function(){
     clearSection(playTable)
 })
 
+socket.on('loadLastHand', function(){
+    grabLastHandFromStorage()
+})
+
 //Updates player nameplates on new player joins, score changes, and player name changes
 socket.on('updatePlayers', function(playerData){
     
@@ -607,6 +644,11 @@ socket.on('updatePlayers', function(playerData){
         }
 
         if(player.currentCzar){
+            console.log(player.submittedCards)
+            /*
+            if(player.submittedCards && playTable.children.length < 1){
+                createCard(playTable, submittedCards[0], 'red')
+            } */
             currentPlayerNamePlate.id = 'cardCzarNamePlate'
             currentPlayerNamePlate.firstChild.id = 'cardCzarNamePlateContent'
             currentPlayerNamePlate.children[1].id = 'cardCzarScoreContainer'
