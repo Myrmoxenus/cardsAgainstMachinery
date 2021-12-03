@@ -19,9 +19,9 @@ let onLoadData = {
 socket.emit('gamePageLoad', onLoadData)
 
 //Locks cards on a delay while it waits for the server to emit a hand to each player. I'm not in love with this.
-setTimeout(function() {
+/*setTimeout(function() {
     lockCards(playerHand)
-  }, 500);
+  }, 500);*/
 
 //An array that holds the all of the submitted white card candidates. This array is used to cycle through cards while cardCzar is selecting a winner
 let submittedWhiteCardCandidates = []
