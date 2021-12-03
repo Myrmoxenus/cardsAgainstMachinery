@@ -7,7 +7,6 @@ const { Server } = require('socket.io')
 //Card Decks
 let whiteCardArray = require('./cards/GeneratedWhiteCards.js')
 let redCardArray = require('./cards/GeneratedRedCards.js')
-const { connect } = require('tls')
 
 //Sets port to a value
 const PORT = process.env.PORT || 4433
@@ -101,7 +100,7 @@ class game {
     this.players = []
     this.winningScore = 10
     this.redCardCurrentlySubmitted = false
-    this.currentRedCardContent = ''
+    this.currentlySubmittedRedCard = ''
     this.timeOfLastTurn = new Date()
   }
   //Advances the game turn
@@ -215,9 +214,13 @@ io.on('connection', (socket) => {
         //Once the game has at least 3 players, assign the first player to Card Czar
         if(connectedPlayers.length === 3){
           connectedPlayers[0].setPlayerToCzar()
+
                 
           io.to(currentGame.roomName).emit('updatePlayers', currentGame.players)
             }
+      }
+      if(currentGame.currentlySubmittedRedCard){
+        socket.emit('redCardSelection', currentGame.currentlySubmittedRedCard)
       }
       //Places player in the the socket room associated with the game's name
       socket.join(currentGame.roomName)
@@ -282,6 +285,8 @@ io.on('connection', (socket) => {
       currentPlayer.submittedCardsThisTurn = true
       currentGame.redCardCurrentlySubmitted = true
       let redCardContent = submittedCards[0]
+      currentGame.currentlySubmittedRedCard = redCardContent
+      console.log(currentGame.currentlySubmittedRedCard)
       io.to(currentGame.roomName).emit('redCardSelection', redCardContent)
     }
     //If the card is submitted by a player that is not the current czar, and a red card is already selected, then the card submission is handled as a white card submission
@@ -336,6 +341,7 @@ io.on('connection', (socket) => {
   socket.on('winnerSelected', function(winnerCards){
     let currentPlayer = playerMap.get(socket.id)
     let currentGame = gameMap.get(currentPlayer.roomName)
+    currentGame.currentlySubmittedRedCard = ''
     //Authenticates that the winner selection emission is from the cardCzar
     if(currentPlayer.currentCzar && currentGame.redCardCurrentlySubmitted && winnerCards){
       let winningPlayer = currentGame.players.find(player => 
@@ -407,6 +413,8 @@ io.on('connection', (socket) => {
           player.drewCardsThisTurn = false
           player.votedToSkip = false
         })
+        currentGame.currentlySubmittedRedCard = ''
+        currentGame.redCardCurrentlySubmitted = false
         io.to(currentGame.roomName).emit('clearTable', currentGame.players)
       }
 
