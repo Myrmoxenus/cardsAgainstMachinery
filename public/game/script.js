@@ -111,10 +111,11 @@ function drawHandButtonClick(){
 
 //function for submitCardButton
 function submitCardButtonClick(){
-    this.remove()
-    if(submissionArray){
+    console.log(submissionArray)
+    if(submissionArray.length !== 0){
         //If white cards are selected, removes them from player's hand on submission
         let selectedCards = document.getElementsByClassName('whiteCardSelected')
+        console.log(selectedCards.length)
         if(selectedCards.length !== 0){
             let storedCardArray = JSON.parse(window.localStorage.getItem('storedCards')) || []
             while(selectedCards[0]){
@@ -129,6 +130,10 @@ function submitCardButtonClick(){
             }
         }
         socket.emit('cardSubmission', submissionArray);
+        this.remove()
+    }
+    else{
+        
     }
     //Clears submission array
     submissionArray = []
@@ -364,7 +369,7 @@ function storeCard(){
         storeCardButton.remove()
 
         let unstoreCardButton = document.createElement('img')
-        unstoreCardButton.src = 'images/unstore.png'
+        unstoreCardButton.src = 'images/store.png'
         unstoreCardButton.className = 'storeCardButton'
         unstoreCardButton.addEventListener('click', unstoreCard)
         parentCard.appendChild(unstoreCardButton)
@@ -386,7 +391,7 @@ function unstoreCard(){
     parentCard.classList.remove('storedCard')
     unstoreCardButton.remove('storedCard')
     let storeCardButton = document.createElement('img')
-    storeCardButton.src = 'images/store.png'
+    storeCardButton.src = 'images/unstore.png'
     storeCardButton.className = 'storeCardButton'
     storeCardButton.addEventListener('click', storeCard)
     parentCard.appendChild(storeCardButton)
@@ -401,14 +406,14 @@ function createCardStorageButtons(){
         if(currentCard.children.length < 2){
             if(currentCardClassesArray.includes('storedCard')){
                 let unstoreCardButton = document.createElement('img')
-                unstoreCardButton.src = 'images/unstore.png'
+                unstoreCardButton.src = 'images/store.png'
                 unstoreCardButton.className = 'storeCardButton'
                 unstoreCardButton.addEventListener('click', unstoreCard)
                 currentCard.appendChild(unstoreCardButton)
             }
             else{
                 let storeCardButton = document.createElement('img')
-                storeCardButton.src = 'images/store.png'
+                storeCardButton.src = 'images/unstore.png'
                 storeCardButton.className = 'storeCardButton'
                 storeCardButton.addEventListener('click', storeCard)
                 currentCard.appendChild(storeCardButton)
@@ -486,7 +491,7 @@ clearSection(playTable)
 createCard(playTable,redCardContent,'red')
 lockCards(playTable)
 console.log(submissionArray)
-//If the player was not the Czar and therefore does not have a red card currently sitting in their submission array, it unlocks their hand to allow them to submit cards
+//If the player was not the Czar, it unlocks their hand to allow them to submit cards
     if(!currentCzar){
         unlockCards(playerHand)
         createButton('drawHand', playerButtonContainer)

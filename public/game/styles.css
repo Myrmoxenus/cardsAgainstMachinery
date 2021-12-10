@@ -366,6 +366,17 @@ input{
     transform: translate(4.7vw);
 }
 
+#messageBox{
+    position: absolute;
+    top: 0.5vw;
+    left: 23vw;
+    height: 20vw;
+    width: 40vw;
+    padding: 0vw;
+    font-size: 4vw;
+    
+    color:#F6E8E0;
+}
 
 #playTable{
     /*background-color: #858585;*/

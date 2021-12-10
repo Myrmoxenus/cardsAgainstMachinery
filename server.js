@@ -7,6 +7,7 @@ const { Server } = require('socket.io')
 //Card Decks
 let whiteCardArray = require('./cards/GeneratedWhiteCards.js')
 let redCardArray = require('./cards/GeneratedRedCards.js')
+//let universallyExplicitWords = []
 
 //Sets port to a value
 const PORT = process.env.PORT || 4433
@@ -74,18 +75,24 @@ class player {
     io.to(this.socketID).emit('newRedCards', newRedCardArray)
   }
 
-  emitHandToPlayer(){
-  //Sends new player their first hand
-  let newHandArray = []
-  let maxHandSize = 14
-  while(newHandArray.length < maxHandSize) {
-    newHandArray.push(whiteCardArray[randomUpTo(whiteCardArray.length-1)])
+  emitHandToPlayer(explicitWordArray){
+    explicitWordArray = explicitWordArray || []
+    //Sends new player their first hand
+    let newHandArray = []
+    let maxHandSize = 14
+    while(newHandArray.length < maxHandSize) {
+      let randomlySelectedCard = whiteCardArray[randomUpTo(whiteCardArray.length-1)]
+      let randomlySelectedCardWordsArray = randomlySelectedCard.split(' ')
+      let containsExplicitWord = explicitWordArray.some(explicitWord => randomlySelectedCardWordsArray.includes(explicitWord))
+      if(!containsExplicitWord){
+        newHandArray.push(randomlySelectedCard)
+      }
     }
-    io.to(this.socketID).emit('newPlayerHand', newHandArray)
-  if(this.submittedCardsThisTurn || this.currentCzar){
-    io.to(this.socketID).emit('lockPlayerHand')
+      io.to(this.socketID).emit('newPlayerHand', newHandArray)
+    if(this.submittedCardsThisTurn || this.currentCzar){
+      io.to(this.socketID).emit('lockPlayerHand')
+      }
     }
-  }
 }
 
 

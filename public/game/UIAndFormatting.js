@@ -59,6 +59,7 @@ function generatePadding(cardContent, fontSize){
 
 //Function that appends a card at a supplied location with supplied content with formatting
 function createCard(destination, cardContent, color){
+
     cardContent = cardContent || ' '
     color = color || 'white'
     //Creates card div
