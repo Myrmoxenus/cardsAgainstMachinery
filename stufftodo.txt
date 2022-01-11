@@ -1,14 +1,16 @@
 -------
 Cleanup
 
-Losing internet broke the game
+Losing internet broke the game. Test this because i have no idea why
 
-Filter for the n word
-Draw Card Button Sometimes Doesn't Appear?
+Draw Card Button Sometimes Doesn't Appear? No idea why
+
 Submit card button appears while waiting for a red card
 Card locking doesn't work on mobile
+
 More descriptive error handling
-Don't let the submit card button disappear if you submitted nothing
+    Need an error page for Game is Full
+    Need a Content Warning
 Make red card visible during winner selection
 Show winning card
 
